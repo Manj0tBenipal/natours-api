@@ -5,78 +5,117 @@ const {
   convertToInteger,
 } = require('../utils');
 
-exports.getTours = async (req, res) => {
-  //The original query object mutated using a middleware to prepend mongodb operators with '$'
-  const urlQueryObj = { ...req.query };
+class APIFeatures {
+  /**
+   * @param  dbModel mongoose model on using which all the features will be implemented
+   * @param reqQueryObj  qyeryString object from incoming request
+   */
+  constructor(dbModel, reqQueryObj) {
+    this.dbModel = dbModel;
+    this.reqQueryObj = reqQueryObj;
+    this.filteredQueryObj = this.filter(reqQueryObj);
+    this.dbQuery = this.find();
+    this.itemsPerPage = process.env.PER_PAGE_RESULT_COUNT || 15;
+    this.maxPageCount = 1;
+    this.currentPage = 1;
+  }
 
   /**
+   *
+   * @param reqObj incoming req.query object
    * This filtetred object omits parameters that are used by the API
    * but are not compatible with the syntax of mongodb filter object
+   * @returns an object which has changed by removing extra parameters
+   * that are not a part of filterObject required in mongoose query
    */
-  const filteredQueryObj = { ...urlQueryObj };
-  const excludedFields = ['page', 'sort', 'limit', 'fields'];
-  excludedFields.forEach((field) => {
-    delete filteredQueryObj[field];
-  });
-  try {
-    let query = Tour.find(filteredQueryObj);
+  filter(query) {
+    const filteredQueryObj = { ...query };
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach((field) => {
+      delete filteredQueryObj[field];
+    });
+    return filteredQueryObj;
+  }
 
-    //-------------SORTING--------------------------
-    if (urlQueryObj.sort) {
-      /**
-       * The data can be sorted based on mutiple parameters
-       * Mongoose's Model.find.sort() method accepts multiple parameters separated by a space
-       * The query from URL provides parameters separated by a ","
-       * the String.replace() is used to make teh incoming data compatible with the .sort() arguments
-       */
-      query = query.sort(replaceCommaWithSpace(urlQueryObj.sort));
-    }
+  find() {
+    return this.dbModel.find({ ...this.filteredQueryObj });
+  }
 
-    //---------FILTERING SPECIFIC FIELDS-------------------
-    if (urlQueryObj.fields) {
-      query = query.select(replaceCommaWithSpace(urlQueryObj.fields));
-    }
+  /**
+   * This methods uses the sort key-value pair in the incoming req(reqQueryObj)
+   * to filter the data based on the parameters provided in reqQueryObj.sort
+   * The data can be sorted based on mutiple parameters
+   * Mongoose's Model.find.sort() method accepts multiple parameters separated by a space
+   * The query from URL provides parameters separated by a ","
+   * Another helper method is used to replace all the commas with a whitespace
+   */
+  sort() {
+    this.dbQuery = this.dbQuery.sort(
+      replaceCommaWithSpace(this.reqQueryObj.sort),
+    );
+  }
 
-    //------------ PER PAGE LIMITS-------------------
+  /**
+   * This method applys .select() to the dbQueryObj and
+   * modifies the query to return only those fiels which are specified in the reqQueryObj.
+   * This takes affect in tehe data returned by the query when it is executed
+   */
+  selectFields() {
+    this.dbQuery = this.dbQuery.select(
+      replaceCommaWithSpace(this.reqQueryObj.fields),
+    );
+  }
 
-    //Default per page limit is set using the environment variable
-    let limit = process.env.PER_PAGE_RESULT_COUNT || 15;
-    const docCount = await Tour.countDocuments(filteredQueryObj);
-    let maxPages = 0;
-    //Per Page limit is changed only if query contains limit parameter
-    if (urlQueryObj.limit) {
-      //limit is validated and is required to be a number
-      //In case of an invalid value an error is thrown
-      limit = convertToInteger(urlQueryObj.limit);
-    }
+  async setItemsPerPage() {
+    //limit is validated and is required to be a number
+    //In case of an invalid value an error is thrown
+    this.itemsPerPage = convertToInteger(this.reqQueryObj.limit);
+    const docCount = await this.dbModel.countDocuments({
+      ...this.filteredQueryObj,
+    });
     /**
      * Max Pages are calculated based on the total number of docs available
      * and the limit set by user or the default limit
      */
-    maxPages = getMaxPageCount(docCount, limit);
-    query = query.limit(limit);
+    this.maxPageCount = getMaxPageCount(docCount, this.itemsPerPage);
+    this.dbQuery = this.dbQuery.limit(this.itemsPerPage);
+  }
 
-    //------------- PAGINATION ------------
-    //default page number is set to one unless specified in query
+  applyPagination() {
     let pageNumber = 1;
-    if (urlQueryObj.page) {
-      // Page number is validated and is required to be an number
-      pageNumber = convertToInteger(urlQueryObj.page);
-      if (pageNumber > maxPages) {
-        throw new Error('This page does not exist');
-      }
-    }
-    // the limit variable is used to skip documents depending upon the page number provided
-    query = query.skip(limit * (pageNumber - 1));
 
-    //--------------EXECUTING THE QUERY----------------
-    const tours = await query;
+    // Page number is validated and is required to be an number
+    pageNumber = convertToInteger(this.reqQueryObj.page);
+    if (pageNumber > this.maxPageCount) {
+      throw new Error('This page does not exist');
+    }
+    this.currentPage = pageNumber;
+    // the limit variable is used to skip documents depending upon the page number provided
+    this.dbQuery = this.dbQuery.skip(this.itemsPerPage * (pageNumber - 1));
+  }
+
+  async execute() {
+    if (this.reqQueryObj.fields) this.selectFields();
+    if (this.reqQueryObj.sort) this.sort();
+    if (this.reqQueryObj.limit) await this.setItemsPerPage();
+    if (this.reqQueryObj.page) this.applyPagination();
+    const data = await this.dbQuery;
+    return {
+      currentPage: this.currentPage,
+      totalPages: this.maxPageCount,
+      results: data.length,
+      data: data,
+    };
+  }
+}
+exports.getTours = async (req, res) => {
+  try {
+    const fetchTours = new APIFeatures(Tour, req.query);
+
+    const tours = await fetchTours.execute();
     res.status(200).json({
       status: 'success',
-      currentPage: pageNumber,
-      pageCount: maxPages,
-      results: tours.length,
-      data: { tours },
+      ...tours,
     });
   } catch (err) {
     res.status(500).json({
