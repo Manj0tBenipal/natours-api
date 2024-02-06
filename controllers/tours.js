@@ -6,8 +6,13 @@ const {
 } = require('../utils');
 
 exports.getTours = async (req, res) => {
+  //The original query object mutated using a middleware to prepend mongodb operators with '$'
   const urlQueryObj = { ...req.query };
 
+  /**
+   * This filtetred object omits parameters that are used by the API
+   * but are not compatible with the syntax of mongodb filter object
+   */
   const filteredQueryObj = { ...urlQueryObj };
   const excludedFields = ['page', 'sort', 'limit', 'fields'];
   excludedFields.forEach((field) => {
@@ -172,4 +177,9 @@ exports.deleteTour = async (req, res) => {
           : 'failed to delete document',
     });
   }
+};
+
+exports.aliasTopFiveTours = (req, res, next) => {
+  req.query = { limit: '5', sort: 'ratingsAverage' };
+  next();
 };
