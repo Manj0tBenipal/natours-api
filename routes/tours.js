@@ -1,5 +1,5 @@
 const express = require('express');
-const { modifyQueryToFilterObjSyntax } = require('../utils');
+const { modifyQueryToFilterObjSyntax } = require('../utils/functions');
 
 const router = express.Router();
 const controller = require(`../controllers/tours`);
