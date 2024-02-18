@@ -61,9 +61,10 @@ exports.addTour = async (req, res) => {
 exports.updateTour = async (req, res) => {
   const { params, body } = req;
   try {
-    const data = await Tour.updateOne(
+    const data = await Tour.findOneAndUpdate(
       { _id: params.id },
       { $set: { ...body } },
+      { runValidators: true },
     );
     if (data.matchedCount === 0) {
       throw new Error('400');
