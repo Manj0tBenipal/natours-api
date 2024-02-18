@@ -134,7 +134,11 @@ toursSchema.pre('findOneAndUpdate', async function (next) {
   if (!doc) {
     throw new Error('Failed to fetch document while validating');
   }
-  let valid = false;
+  /**
+   * valid is a boolean value which is changed only when price or priceDiscount are being updated
+   * in case where only other properties of the document are being modified, this section passes the validation
+   */
+  let valid = true;
   let errorField = '';
   const errorMessage =
     'Validation Error. priceDicount cannot be greater than price';
