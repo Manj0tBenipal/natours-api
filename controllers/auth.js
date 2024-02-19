@@ -47,7 +47,7 @@ exports.login = async (req, res) => {
 
     const user = await User.findOne({ email: email });
     if (!user) {
-      throw new Error('User does not exist');
+      throw new Error('Authentication failed!. Incorrect email or passowrd');
     }
     /**
      *compare the encryped password with the one provided by user
@@ -57,7 +57,7 @@ exports.login = async (req, res) => {
 
     //Error is thrown on password mismatch
     if (!passwordMatch)
-      throw new Error('Authentication failed!. Incorrect passowrd');
+      throw new Error('Authentication failed!. Incorrect email or passowrd');
 
     // A sucess res is sent when all the auth steps are completed
     res.status(200).json({
