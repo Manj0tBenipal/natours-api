@@ -43,7 +43,7 @@ exports.login = async (req, res) => {
      */
     if (!email || !password) throw new Error('email or password not provided');
 
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email: email }).select('+password');
     if (!user) {
       throw new Error('Authentication failed!. Incorrect email or passowrd');
     }
@@ -51,7 +51,7 @@ exports.login = async (req, res) => {
      *compare the encryped password with the one provided by user
      *The .passwordMatch() is an instance mathod available on all the documents of User model
      */
-    const passwordMatch = await user.passwordMatch(password);
+    const passwordMatch = await user.passwordMatch(password, user.password);
 
     //Error is thrown on password mismatch
     if (!passwordMatch)
