@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
+const { signJWT } = require('../utils/functions');
 
 exports.signup = async (req, res) => {
   try {
@@ -11,9 +11,7 @@ exports.signup = async (req, res) => {
       passwordConfirm: userData.passwordConfirm,
       photo: userData.photo,
     });
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRE,
-    });
+    const token = signJWT(newUser._id);
     res.status(201).json({
       status: 'success',
       token,
@@ -59,9 +57,11 @@ exports.login = async (req, res) => {
     if (!passwordMatch)
       throw new Error('Authentication failed!. Incorrect email or passowrd');
 
+    const token = signJWT(user._id);
     // A sucess res is sent when all the auth steps are completed
     res.status(200).json({
       status: 'success',
+      token,
       data: {
         user: { name: user.name, email: user.email, id: user._id },
       },
