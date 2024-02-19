@@ -40,22 +40,19 @@ exports.signup = async (req, res) => {
  */
 exports.login = async (req, res) => {
   try {
+    const { email, password } = req.body;
     /**
      * if email or password is not provided throw nre Error
      */
-    if (!req.body.email || !req.body.password)
-      throw new Error('email or password not provided');
+    if (!email || !password) throw new Error('email or password not provided');
 
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ email: email });
     if (!user) {
       throw new Error('User does not exist');
     }
 
     //compare the encryped password with the one provided by user
-    const passwordMatch = await bcrypt.compare(
-      req.body.password,
-      user.password,
-    );
+    const passwordMatch = await bcrypt.compare(password, user.password);
 
     //Error is thrown on password mismatch
     if (!passwordMatch)
