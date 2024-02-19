@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -41,5 +42,16 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+/**
+ * Password hash is generated before saving the field to the database
+ * This middleware runs after the Schema-level validations therefore, passwords are
+ * compared and validated before generating hash and the need for saving passwordConfirm is no longer valid
+ */
+userSchema.pre('save', async function (next) {
+  if (!this.isNew) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  this.passwordConfirm = undefined;
+  next();
+});
 const User = mongoose.model('User', userSchema);
 module.exports = User;
