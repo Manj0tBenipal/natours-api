@@ -55,12 +55,19 @@ userSchema.pre('save', async function (next) {
   next();
 });
 /**
+ * /**
  * Instance method used to compare passowrd while logging in
  * In case of an error, it will be caught in the /login route handler
  * and an appropriate response will be sent
+ * @param {String} candidatePassword password sent by user in the request
+ * @param {String} encryptedPassword encrypted password stored in database
+ * @returns
  */
-userSchema.methods.passwordMatch = async function (candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+userSchema.methods.passwordMatch = async function (
+  candidatePassword,
+  encryptedPassword,
+) {
+  return await bcrypt.compare(candidatePassword, encryptedPassword);
 };
 
 const User = mongoose.model('User', userSchema);
