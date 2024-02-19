@@ -59,7 +59,7 @@ exports.login = async (req, res) => {
       throw new Error('Authentication failed!. Incorrect passowrd');
 
     // A sucess res is sent when all the auth steps are completed
-    res.status(201).json({
+    res.status(200).json({
       status: 'success',
       data: {
         user: user,
