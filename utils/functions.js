@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 /**
  * used as a middleware to get requests in /api/v1/tours.
  * The query is being modified to follow the syntax of filter object used in mongoose queries
@@ -47,3 +48,12 @@ exports.convertToInteger = (input) => {
   }
   return parseInt(input, 10);
 };
+/**
+ *This function accepts a userId and generates a JWT
+ * @param {String} id
+ * @returns signed JWT
+ */
+exports.signJWT = (id) =>
+  jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE,
+  });
