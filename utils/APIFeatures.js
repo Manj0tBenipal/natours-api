@@ -4,7 +4,7 @@ const {
   convertToInteger,
 } = require('./functions');
 
-exports.APIFeatures = class {
+class APIFeatures {
   /**
    * @param  dbModel mongoose model on using which all the features will be implemented
    * @param reqQueryObj  qyeryString object from incoming request
@@ -106,4 +106,5 @@ exports.APIFeatures = class {
       data: data,
     };
   }
-};
+}
+module.exports = APIFeatures;
