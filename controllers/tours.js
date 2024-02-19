@@ -1,5 +1,5 @@
 const Tour = require('../models/tourModel');
-const { APIFeatures } = require('../utils/APIFeatures');
+const APIFeatures = require('../utils/APIFeatures');
 
 exports.getTours = async (req, res) => {
   try {
