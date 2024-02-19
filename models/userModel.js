@@ -32,6 +32,12 @@ const userSchema = new mongoose.Schema({
     requried: [true, 'Password is mandatory'],
     minLength: [12, 'password should be minimum 12 characters long'],
     maxLength: [20, 'password can be maximun 20 character long'],
+    validate: {
+      validator: function (value) {
+        return this.password === value;
+      },
+      message: 'The passwords do not match',
+    },
   },
 });
 
