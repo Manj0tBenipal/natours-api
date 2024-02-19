@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 /**
- * used as a middleware to get requests in /api/v1/tours.
+ * used as a middleware to get requests in /api/v1/tours, /api/v1/users.
  * The query is being modified to follow the syntax of filter object used in mongoose queries
  * The operators from query are passed as 'gte, lte, lt, gt' and after changes are made to this object all
  * the operators used in the object are prepended with '$'
@@ -14,7 +14,7 @@ const jwt = require('jsonwebtoken');
  */
 exports.modifyQueryToFilterObjSyntax = (req, res, next) => {
   try {
-    req = JSON.parse(
+    req.query = JSON.parse(
       JSON.stringify({ ...req.query }).replace(
         /\b(gte|gt|lt|lte)\b/g,
         (match) => `$${match}`,
