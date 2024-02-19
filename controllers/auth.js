@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const User = require('../models/userModel');
 
 exports.signup = async (req, res) => {
@@ -50,8 +49,11 @@ exports.login = async (req, res) => {
     if (!user) {
       throw new Error('User does not exist');
     }
-    //compare the encryped password with the one provided by user
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    /**
+     *compare the encryped password with the one provided by user
+     *The .passwordMatch() is an instance mathod available on all the documents of User model
+     */
+    const passwordMatch = await user.passwordMatch(password);
 
     //Error is thrown on password mismatch
     if (!passwordMatch)
