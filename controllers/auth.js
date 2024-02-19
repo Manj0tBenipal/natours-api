@@ -19,7 +19,7 @@ exports.signup = async (req, res) => {
       status: 'success',
       token,
       data: {
-        user: newUser,
+        user: { name: newUser.name, email: newUser.email, id: newUser._id },
       },
     });
   } catch (err) {
@@ -50,7 +50,6 @@ exports.login = async (req, res) => {
     if (!user) {
       throw new Error('User does not exist');
     }
-
     //compare the encryped password with the one provided by user
     const passwordMatch = await bcrypt.compare(password, user.password);
 
@@ -62,7 +61,7 @@ exports.login = async (req, res) => {
     res.status(200).json({
       status: 'success',
       data: {
-        user: user,
+        user: { name: user.name, email: user.email, id: user._id },
       },
     });
   } catch (err) {
