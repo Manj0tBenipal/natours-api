@@ -132,7 +132,7 @@ userSchema.methods.passwordChangedAfter = function (timeStamp) {
 };
 
 /**
- * This function creates a random 32 bit string which serves the purpose of authentication
+ * This function creates a random 36 characters string which serves the purpose of authentication
  * when a user resets their password.
  * The database stores a hashed version of this string as passwordResetToken
  * The token has expiry of 10 mins from the time of its creation which is stored as
