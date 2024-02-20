@@ -104,7 +104,7 @@ exports.isLoggedIn = async (req, res, next) => {
      * If token is found to be invalid promise will be rejected and
      * code will fallbak to the catch block which will send a 'failed' respose
      */
-    const { id } = await new Promise((resolve, reject) => {
+    const { id, iat } = await new Promise((resolve, reject) => {
       jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) reject(err);
         resolve(decoded);
@@ -126,6 +126,8 @@ exports.isLoggedIn = async (req, res, next) => {
       statusCode = 401;
       throw new Error('Invalid User!');
     }
+    if (user.passwordChangedAfter(iat))
+      throw new Error('Your password was changed! You need to login again');
     next();
   } catch (err) {
     return res.status(statusCode).json({
