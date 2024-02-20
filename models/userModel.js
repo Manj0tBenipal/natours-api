@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -44,8 +45,14 @@ const userSchema = new mongoose.Schema({
   lastPasswordChange: {
     type: Date,
   },
-  passwordResetToken: String,
-  passwordResetTokenExpire: Date,
+  passwordResetToken: {
+    type: String,
+    select: false,
+  },
+  passwordResetTokenExpire: {
+    type: Date,
+    select: false,
+  },
   role: {
     type: String,
     enum: {
@@ -146,6 +153,7 @@ userSchema.methods.createPasswordResetToken = function () {
     .createHash('sha256')
     .update(token)
     .digest('hex');
+  console.log({ token }, { hash: this.passwordResetToken });
   //Set the expiry of reset token to currentDate + 10mins
   this.passwordResetTokenExpire = Date.now() + 10 * 60;
   return token;
