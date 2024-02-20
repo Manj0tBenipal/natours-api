@@ -57,6 +57,16 @@ userSchema.pre('save', async function (next) {
   this.passwordConfirm = undefined;
   next();
 });
+/**
+ * This function changes the lastPasswordChange field in a User document
+ * to the current time when a user was registered for the first time
+ */
+userSchema.pre('save', function (next) {
+  //exits the function if user is updating the document
+  if (!this.isNew) return next();
+  this.lastPasswordChange = Date.now();
+  next();
+});
 
 /**
  * This function modifies the lastPasswordChange field for a document
