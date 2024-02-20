@@ -20,5 +20,5 @@ router.route('/').get(isLoggedIn, modifyQueryToFilterObjSyntax, getAllUsers);
 router
   .route('/:id')
   .patch(updateUser)
-  .delete(isLoggedIn, allowAccessTo('admin', 'lead-guide'), deleteUser);
+  .delete(isLoggedIn, allowAccessTo('admin'), deleteUser);
 module.exports = router;
