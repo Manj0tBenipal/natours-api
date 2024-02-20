@@ -41,15 +41,19 @@ const userSchema = new mongoose.Schema({
       message: 'The passwords do not match',
     },
   },
+  lastPasswordChange: {
+    type: Date,
+  },
 });
 
 /**
+ * This function generates an encrypted password when a new user is signed up
  * Password hash is generated before saving the field to the database
- * This middleware runs after the Schema-level validations therefore, passwords are
- * compared and validated before generating hash and the need for saving passwordConfirm is no longer valid
  */
 userSchema.pre('save', async function (next) {
+  //exits the function if user is updating the document
   if (!this.isNew) return next();
+
   this.password = await bcrypt.hash(this.password, 10);
   this.passwordConfirm = undefined;
   next();
