@@ -126,7 +126,6 @@ exports.isLoggedIn = async (req, res, next) => {
       statusCode = 401;
       throw new Error('Invalid User!');
     }
-    console.log(user);
     next();
   } catch (err) {
     return res.status(statusCode).json({

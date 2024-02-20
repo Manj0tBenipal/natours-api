@@ -84,7 +84,6 @@ userSchema.pre('findOneAndUpdate', async function (next) {
 
     this._update.$set.password = encryptedPassword;
     this._update.$set.lastPasswordChange = Date.now();
-    console.log(this._update.$set);
     next();
   } catch (err) {
     next(err);
