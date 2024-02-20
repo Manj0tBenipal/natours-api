@@ -51,6 +51,7 @@ const userSchema = new mongoose.Schema({
       message: 'Role can be either customer or admin',
     },
     select: false,
+    default: 'customer',
   },
 });
 /**
@@ -74,18 +75,6 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-/**
- * This function runs whenever a new document is created
- * By default every new user is assigned a role os customer
- */
-userSchema.pre('save', function (next) {
-  //exit if the  document is being updated
-  if (!this.isNew) return next();
-
-  //assign the role if a new document is being created
-  this.role = 'customer';
-  next();
-});
 /**
  * 1. This function changes the encrypted password in the database whenever user updates their passoword
  * Also at the same time :
