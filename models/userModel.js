@@ -53,30 +53,26 @@ const userSchema = new mongoose.Schema({
 userSchema.pre('save', async function (next) {
   //exits the function if user is updating the document
   if (!this.isNew) return next();
-
   this.password = await bcrypt.hash(this.password, 10);
   this.passwordConfirm = undefined;
   next();
 });
+
 /**
  * This function modifies the lastPasswordChange field for a document
- * The field is updated when a user is signed up or password is changed
- *
- * It is done in order to check the validity of JWTs
+ * The field is updated when a password is changed for an existing user
  */
-userSchema.pre('save', async function (next) {
-  //only executes if user is updating an existing document
-  if (!this.isNew) {
-    //checks if user has password in the $set object
-    const password = this.get('password');
-    //if password is undefined, it means user is not modifying password
-    if (!password) return next();
-    //if password is being modified change the lastPassowordChange date
-    this.lastPasswordChange = Date.now();
-    return next();
-  }
-  //executes if a new user is being registered
-  this.lastPasswordChange = Date.now();
+userSchema.pre('findOneAndUpdate', async function (next) {
+  //exit the function if password is not being updated
+  if (!this.get('password')) return next();
+  /**
+   * 1. find the doc by id
+   * 2. change the lastPasswordChange to currentTime
+   * 3. Move to the next Middleware
+   */
+  const doc = await this.model.findById(this._conditions._id);
+  doc.lastPasswordChange = Date.now();
+  await doc.save();
   next();
 });
 /**
