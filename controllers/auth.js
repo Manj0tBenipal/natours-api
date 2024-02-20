@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const { signJWT } = require('../utils/functions');
 
@@ -70,6 +71,68 @@ exports.login = async (req, res) => {
     res.status(500).json({
       status: 'failed',
       err: err.message,
+    });
+  }
+};
+
+exports.isLoggedIn = async (req, res, next) => {
+  //this variable is used in catch block to send different status codes
+  //in response according to the reason for error
+  let statusCode = 200;
+  try {
+    //--CHECKING IF JWT IS PRESENT IN HEADERS
+    const { headers } = req;
+    const authHeader = headers.authorization;
+    //if 'authorization' is not present in headers -> user is not logged in
+    //Access to the protected route is denied
+    if (!authHeader || !authHeader.startsWith('Bearer')) {
+      statusCode = 401;
+      throw new Error('You are not logged in');
+    }
+    //remove the prefix of Bearer from the token
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+      statusCode = 401;
+      throw new Error('You are not logged in');
+    }
+
+    //---VERIFYING JWT---
+    /**
+     * Promisify the async version of jwt.verify()
+     * and await the resolved token
+     *
+     * If token is found to be invalid promise will be rejected and
+     * code will fallbak to the catch block which will send a 'failed' respose
+     */
+    const { id } = await new Promise((resolve, reject) => {
+      jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) reject(err);
+        resolve(decoded);
+      });
+    });
+
+    //---- VERYFYING THE PAYLOAD FOR USER DETAILS-----
+    //if token does not contain 'id' field the payload has been modifies
+    //in which case Error is thrown
+    if (!id) {
+      statusCode = 401;
+      throw new Error('Invalid credentails');
+    }
+
+    //Check if the user exists using the id from payload
+    //if not throw an Error
+    const user = await User.findById(id);
+    if (!user) {
+      statusCode = 401;
+      throw new Error('Invalid User!');
+    }
+    console.log(user);
+    next();
+  } catch (err) {
+    return res.status(statusCode).json({
+      status: 'failed',
+      message: err.message,
+      stack: err,
     });
   }
 };
