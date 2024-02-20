@@ -121,7 +121,7 @@ exports.isLoggedIn = async (req, res, next) => {
 
     //Check if the user exists using the id from payload
     //if not throw an Error
-    const user = await User.findById(id);
+    const user = await User.findById(id).select('+role');
     if (!user) {
       statusCode = 401;
       throw new Error('Invalid User!');
@@ -138,3 +138,29 @@ exports.isLoggedIn = async (req, res, next) => {
     });
   }
 };
+
+/**
+ * This function is a wrapper around middleware function which accepts one or more
+ * String arguments which are user roles.
+ * These roles are then used inside of middleware function to check if the user accessing
+ * the route has a matching role.
+ * If the user's role is in the allowedRoles then the req is passed down to the middleware stack
+ * if the user's role is not in allowedRoles an error response is sent
+ * @param  {...String} roles
+ * @returns a middleware function that handles the access to route
+ */
+exports.allowAccessTo =
+  (...allowedRoles) =>
+  (req, res, next) => {
+    try {
+      const userRole = req.user.role;
+      if (!allowedRoles.includes(userRole))
+        throw new Error('Access restricted');
+      next();
+    } catch (err) {
+      res.status(401).json({
+        status: 'failed',
+        err: err.message,
+      });
+    }
+  };
