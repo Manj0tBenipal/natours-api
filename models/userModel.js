@@ -59,6 +59,27 @@ userSchema.pre('save', async function (next) {
   next();
 });
 /**
+ * This function modifies the lastPasswordChange field for a document
+ * The field is updated when a user is signed up or password is changed
+ *
+ * It is done in order to check the validity of JWTs
+ */
+userSchema.pre('save', async function (next) {
+  //only executes if user is updating an existing document
+  if (!this.isNew) {
+    //checks if user has password in the $set object
+    const password = this.get('password');
+    //if password is undefined, it means user is not modifying password
+    if (!password) return next();
+    //if password is being modified change the lastPassowordChange date
+    this.lastPasswordChange = Date.now();
+    return next();
+  }
+  //executes if a new user is being registered
+  this.lastPasswordChange = Date.now();
+  next();
+});
+/**
  * /**
  * Instance method used to compare passowrd while logging in
  * In case of an error, it will be caught in the /login route handler
