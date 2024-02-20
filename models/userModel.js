@@ -130,5 +130,26 @@ userSchema.methods.passwordChangedAfter = function (timeStamp) {
   );
   return passChangeInSec > timeStamp;
 };
+
+/**
+ * This function creates a random 32 bit string which serves the purpose of authentication
+ * when a user resets their password.
+ * The database stores a hashed version of this string as passwordResetToken
+ * The token has expiry of 10 mins from the time of its creation which is stored as
+ * passwordResetTokenExpire
+ * @returns {String} a random String which is used as a authentication token while resetting password
+ */
+userSchema.methods.createPasswordResetToken = function () {
+  //Generate a random UUID then store the hashed version as passwordResetToken
+  const token = crypto.randomUUID();
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+  //Set the expiry of reset token to currentDate + 10mins
+  this.passwordResetTokenExpire = Date.now() + 10 * 60;
+  return token;
+};
+
 const User = mongoose.model('User', userSchema);
 module.exports = User;
