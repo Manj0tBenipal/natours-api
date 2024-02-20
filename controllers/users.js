@@ -35,7 +35,7 @@ exports.updateUser = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       status: 'failed',
-      err,
+      err: err.message,
     });
   }
 };
@@ -45,6 +45,7 @@ exports.deleteUser = async (req, res) => {
     const { id } = req.params;
     if (!id) throw new Error('Invalid UserID');
     const user = await User.findOneAndDelete({ _id: id });
+    if (!user) throw new Error('Invalid UserID');
     res.status(200).json({
       status: 'success',
       data: {
@@ -54,7 +55,7 @@ exports.deleteUser = async (req, res) => {
   } catch (err) {
     res.status(401).json({
       status: 'failed',
-      err: err,
+      err: err.message,
     });
   }
 };
