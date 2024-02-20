@@ -90,7 +90,6 @@ userSchema.pre('findOneAndUpdate', async function (next) {
   }
 });
 /**
- * /**
  * Instance method used to compare passowrd while logging in
  * In case of an error, it will be caught in the /login route handler
  * and an appropriate response will be sent
@@ -105,5 +104,20 @@ userSchema.methods.passwordMatch = async function (
   return await bcrypt.compare(candidatePassword, encryptedPassword);
 };
 
+/**
+ * This function accepts a timestamp in milliseconds and compares it with
+ * lastPassowordChange field of the document and returns a boolean:
+ * 1. true if password was changed after the input timeStamp
+ * 2. false if lastPasswordChange is less than input timeStamp
+ * @param {Number} timestamp
+ * @returns {Boolean}
+ */
+userSchema.methods.passwordChangedAfter = function (timeStamp) {
+  const passChangeInSec = parseInt(
+    this.lastPasswordChange.getTime() / 1000,
+    10,
+  );
+  return passChangeInSec > timeStamp;
+};
 const User = mongoose.model('User', userSchema);
 module.exports = User;
