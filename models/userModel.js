@@ -45,32 +45,31 @@ const userSchema = new mongoose.Schema({
     type: Date,
   },
 });
-
 /**
- * This function generates an encrypted password when a new user is signed up
+ * NOTE: below are two middlewares performing the same operation which is saving/updating password
+ * But only one middleware is executed at a given time.
+ * 1. 'save': when a new document is created
+ * 2. 'findOneAndUpdate': when an existing document is updated
+ */
+/**
+ * 1. This function generates an encrypted password when a new user is signed up
  * Password hash is generated before saving the field to the database
+ * 2. This function changes the lastPasswordChange field in a User document
+ * to the current time when a user was registered for the first time
  */
 userSchema.pre('save', async function (next) {
   //exits the function if user is updating the document
   if (!this.isNew) return next();
   this.password = await bcrypt.hash(this.password, 10);
-  this.passwordConfirm = undefined;
-  next();
-});
-/**
- * This function changes the lastPasswordChange field in a User document
- * to the current time when a user was registered for the first time
- */
-userSchema.pre('save', function (next) {
-  //exits the function if user is updating the document
-  if (!this.isNew) return next();
   this.lastPasswordChange = Date.now();
+  this.passwordConfirm = undefined;
   next();
 });
 
 /**
- * This function modifies the lastPasswordChange field for a document
- * The field is updated when a password is changed for an existing user
+ * 1. This function changes the encrypted password in the database whenever user updates their passoword
+ * Also at the same time :
+ * this function modifies the lastPasswordChange field for a document
  */
 userSchema.pre('findOneAndUpdate', async function (next) {
   //exit the function if password is not being updated
@@ -80,10 +79,16 @@ userSchema.pre('findOneAndUpdate', async function (next) {
    * 2. change the lastPasswordChange to currentTime
    * 3. Move to the next Middleware
    */
-  const doc = await this.model.findById(this._conditions._id);
-  doc.lastPasswordChange = Date.now();
-  await doc.save();
-  next();
+  try {
+    const encryptedPassword = await bcrypt.hash(this.get('password'), 10);
+
+    this._update.$set.password = encryptedPassword;
+    this._update.$set.lastPasswordChange = Date.now();
+    console.log(this._update.$set);
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 /**
  * /**
