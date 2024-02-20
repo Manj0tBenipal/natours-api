@@ -44,6 +44,14 @@ const userSchema = new mongoose.Schema({
   lastPasswordChange: {
     type: Date,
   },
+  role: {
+    type: String,
+    enum: {
+      values: ['customer', 'admin'],
+      message: 'Role can be either customer or admin',
+    },
+    select: false,
+  },
 });
 /**
  * NOTE: below are two middlewares performing the same operation which is saving/updating password
@@ -54,7 +62,7 @@ const userSchema = new mongoose.Schema({
 /**
  * 1. This function generates an encrypted password when a new user is signed up
  * Password hash is generated before saving the field to the database
- * 2. This function changes the lastPasswordChange field in a User document
+ * 2.Also, the  function changes the lastPasswordChange field in a User document
  * to the current time when a user was registered for the first time
  */
 userSchema.pre('save', async function (next) {
@@ -66,6 +74,18 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+/**
+ * This function runs whenever a new document is created
+ * By default every new user is assigned a role os customer
+ */
+userSchema.pre('save', function (next) {
+  //exit if the  document is being updated
+  if (!this.isNew) return next();
+
+  //assign the role if a new document is being created
+  this.role = 'customer';
+  next();
+});
 /**
  * 1. This function changes the encrypted password in the database whenever user updates their passoword
  * Also at the same time :
