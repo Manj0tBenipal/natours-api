@@ -30,11 +30,11 @@ exports.signup = async (req, res) => {
 
 /**
  * Logging in users,
- * confirm if the user exists,
+ * confirm if the user exists, if No: return error
  * if yes: Match the passwords
  *    a. if match, create a new JWT, sign it and send to user
  *    b. if no match: throw error
- * if No: return error
+ *
  */
 exports.login = async (req, res) => {
   try {
@@ -128,6 +128,7 @@ exports.isLoggedIn = async (req, res, next) => {
     }
     if (user.passwordChangedAfter(iat))
       throw new Error('Your password was changed! You need to login again');
+    req.user = user;
     next();
   } catch (err) {
     return res.status(statusCode).json({
