@@ -1,9 +1,10 @@
 const express = require('express');
+
+const controller = require(`../controllers/tours`);
 const { modifyQueryToFilterObjSyntax } = require('../utils/functions');
+const { isLoggedIn, allowAccessTo } = require('../controllers/auth');
 
 const router = express.Router();
-const controller = require(`../controllers/tours`);
-const { isLoggedIn, allowAccessTo } = require('../controllers/auth');
 router
   .route('/')
   .get(modifyQueryToFilterObjSyntax, controller.getTours)
