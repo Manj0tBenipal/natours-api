@@ -71,14 +71,29 @@ const userSchema = new mongoose.Schema({
  */
 /**
  * 1. This function generates an encrypted password when a new user is signed up
+ * or the password of an existing user is changed using doc.save()
  * Password hash is generated before saving the field to the database
  * 2.Also, the  function changes the lastPasswordChange field in a User document
  * to the current time when a user was registered for the first time
  */
 userSchema.pre('save', async function (next) {
-  //exits the function if user is updating the document
-  if (!this.isNew) return next();
-  this.password = await bcrypt.hash(this.password, 10);
+  /**
+   * This variable is assigned a value if an old document is being updated
+   * or a new document is being inserted.
+   * This eliminates the need of having separate pre-save hooks to encypt and save
+   * password
+   */
+  let _password;
+  if (!this.isNew) {
+    _password = this.get('password');
+    //in case _password is undefined, the password field is not being updated
+    // the execution moves to the next middleware
+    if (!_password) return next();
+  } else {
+    _password = this.password;
+  }
+
+  this.password = await bcrypt.hash(_password, 10);
   this.lastPasswordChange = Date.now();
   this.passwordConfirm = undefined;
   next();
@@ -154,7 +169,7 @@ userSchema.methods.createPasswordResetToken = function () {
     .update(token)
     .digest('hex');
   //Set the expiry of reset token to currentDate + 10mins
-  this.passwordResetTokenExpire = Date.now() + 10 * 60;
+  this.passwordResetTokenExpire = Date.now() + 10 * 60 * 1000;
   return token;
 };
 
