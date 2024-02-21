@@ -5,6 +5,7 @@ const {
   isLoggedIn,
   allowAccessTo,
   forgotPassword,
+  resetPassword,
 } = require('../controllers/auth');
 const { getAllUsers, updateUser, deleteUser } = require('../controllers/users');
 const { modifyQueryToFilterObjSyntax } = require('../utils/functions');
@@ -14,7 +15,7 @@ const router = express.Router();
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/forgot-password', forgotPassword);
-
+router.post('/reset-password/:token', resetPassword);
 router.route('/').get(isLoggedIn, modifyQueryToFilterObjSyntax, getAllUsers);
 
 //This Update route for now does not ask user for their previous credentials
