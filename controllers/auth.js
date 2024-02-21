@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const { signJWT } = require('../utils/functions');
+const sendEmail = require('../utils/email');
 
 exports.signup = async (req, res) => {
   try {
@@ -164,3 +165,52 @@ exports.allowAccessTo =
       });
     }
   };
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    /**
+     * find the user by the email
+     * if either email is not provided or none of the users in the
+     * database have the same email as the one specified in request then
+     * throw an error
+     */
+    const { email } = req.body;
+    if (!email) throw new Error('Invalid Email');
+    const user = await User.findOne({ email: email }).select(
+      '+passwordResetToken +passwordResetTokenExpire',
+    );
+    if (!user) throw new Error('User does not exist');
+
+    //Generate a new random passsword reset token and store hashed version of
+    //it in the database
+    const passResetToken = user.createPasswordResetToken();
+    await user.save({ validateBeforeSave: false });
+    const dynamicURL = `${process.env.APP_URL}:${process.env.PORT}/users/reset-password/${passResetToken}`;
+    /**
+     * In case there is an error sending the email:
+     * delete passwordResetToken and passwordResetTokenExpire
+     * pass down err to parent try catch which completes the req, res cycle
+     */
+    try {
+      await sendEmail({
+        email: req.body.email,
+        subject: `Your password reset token`,
+        text: dynamicURL,
+      });
+    } catch (err) {
+      user.passwordResetToken = undefined;
+      user.passwordResetTokenExpire = undefined;
+      user.save();
+      throw new Error(err);
+    }
+    res.status(200).json({
+      status: 'success',
+      message: 'email sent',
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'failed',
+      err: err.message,
+    });
+  }
+};
