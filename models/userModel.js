@@ -66,13 +66,13 @@ const userSchema = new mongoose.Schema({
 /**
  * NOTE: below are two middlewares performing the same operation which is saving/updating password
  * But only one middleware is executed at a given time.
- * 1. 'save': when a new document is created
- * 2. 'findOneAndUpdate': when an existing document is updated
+ * 1. 'save': when a new document is created/updated using doc.save()
+ * 2. 'findOneAndUpdate': when an existing document is updated using findOneAndUpdate
  */
 /**
  * 1. This function generates an encrypted password when a new user is signed up
  * or the password of an existing user is changed using doc.save()
- * Password hash is generated before saving the field to the database
+ *  Password hash is generated before saving the field to the database
  * 2.Also, the  function changes the lastPasswordChange field in a User document
  * to the current time when a user was registered for the first time
  */
@@ -85,6 +85,12 @@ userSchema.pre('save', async function (next) {
    */
   let _password;
   if (!this.isNew) {
+    //use the model to find the user by its id
+    const model = this.constructor;
+    const user = await model.findOne(this._id).select('+password');
+    //check if the user is updating the password
+    if (user.password === this.password) return next();
+    //if user is indeed upadting the password then proceed to encryption
     _password = this.get('password');
     //in case _password is undefined, the password field is not being updated
     // the execution moves to the next middleware
