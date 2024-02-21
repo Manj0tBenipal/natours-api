@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const User = require('../models/userModel');
 const { signJWT } = require('../utils/functions');
 const sendEmail = require('../utils/email');
@@ -206,6 +207,59 @@ exports.forgotPassword = async (req, res) => {
     res.status(200).json({
       status: 'success',
       message: 'email sent',
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'failed',
+      err: err.message,
+    });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    // Get the token from link and create the hash using the same algorithm
+    //that was used to hash it at time of generating it
+    const { token } = req.params;
+    if (!token) throw new Error('Invalid password reset link');
+    /**
+     * retrieve password and passwordConfirm from the request body
+     * if either password or passwordCOnfirm is not present throw an error
+     * In case of a mismatch between password and passwordConfirm throw an error
+     */
+    const { password, passwordConfirm } = req.body;
+    if (!password || !passwordConfirm) throw new Error('Insufficient data');
+    if (password !== passwordConfirm) throw new Error('password mismatch!');
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    //Search for the user who has the same hash stored in passwordResetToken
+    const user = await User.findOne({ passwordResetToken: hashedToken }).select(
+      '+passwordResetTokenExpire +passwordResetToken',
+    );
+
+    //If there is no match found the token is invalid
+    if (!user) throw new Error('Invalid or expired password reset link');
+    /**
+     * Check if the token has expired:
+     * if yes: then delete the token and expiry and throw an errors
+     */
+    if (parseInt(user.passwordResetTokenExpire.getTime()) < Date.now()) {
+      user.passwordResetToken = undefined;
+      user.passwordResetTokenExpire = undefined;
+      throw new Error('The link has expired');
+    }
+    //this password is plain text which gets encrypted in a pre-save hook
+    user.password = password;
+    await user.save();
+    //if the password is saved without any errors the token and its expiry are deleted
+    user.passwordResetToken = undefined;
+    user.passwordResetTokenExpire = undefined;
+    await user.save();
+    res.status(200).json({
+      status: 'success',
+      data: {
+        userUpdates: user._id,
+      },
     });
   } catch (err) {
     res.status(404).json({
