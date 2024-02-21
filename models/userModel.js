@@ -78,28 +78,12 @@ const userSchema = new mongoose.Schema({
  */
 userSchema.pre('save', async function (next) {
   /**
-   * This variable is assigned a value if an old document is being updated
-   * or a new document is being inserted.
-   * This eliminates the need of having separate pre-save hooks to encypt and save
-   * password
+   * The function will exit if
+   * the document being is being updated but the password is not.
    */
-  let _password;
-  if (!this.isNew) {
-    //use the model to find the user by its id
-    const model = this.constructor;
-    const user = await model.findOne(this._id).select('+password');
-    //check if the user is updating the password
-    if (user.password === this.password) return next();
-    //if user is indeed upadting the password then proceed to encryption
-    _password = this.get('password');
-    //in case _password is undefined, the password field is not being updated
-    // the execution moves to the next middleware
-    if (!_password) return next();
-  } else {
-    _password = this.password;
-  }
+  if (!this.isNew && !this.isModified('password')) return next();
 
-  this.password = await bcrypt.hash(_password, 10);
+  this.password = await bcrypt.hash(this.passwords, 10);
   this.lastPasswordChange = Date.now();
   this.passwordConfirm = undefined;
   next();
