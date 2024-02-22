@@ -268,3 +268,46 @@ exports.resetPassword = async (req, res) => {
     });
   }
 };
+
+exports.changePassword = async (req, res) => {
+  try {
+    //isLoggedIn route handler is executed before changePassword
+    //on successfull login the isLoggedIn route handler adds user object to the request
+    //if the user was not logged in the response will be sent before reaching this middleware
+    const user = await User.findOne({ _id: req.user._id }).select('+password');
+
+    //retrieve the old password, new password, and a confirmation for new password
+    const { newPassword, newPasswordConfirm, oldPassword } = req.body;
+
+    //if either of the passswords is not provided throw error
+    if (!newPassword || !newPasswordConfirm || !oldPassword)
+      throw new Error('Insufficient data');
+
+    //if new password and its confirmation have a mismatch throw Error
+    if (newPassword !== newPasswordConfirm)
+      throw new Error('New passwords mismatch!');
+
+    //Compare the  old password with the one stored in database
+    if (!(await user.passwordMatch(req.body.oldPassword, user.password)))
+      throw new Error('Your password is incorrect');
+
+    //On successfull authentication save the new password
+    //a pre-save hook will encrypt the password before it is saved to db
+    user.password = newPassword;
+
+    //save the changes
+    await user.save();
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        updatedUser: user._id,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'failed',
+      err: err.message,
+    });
+  }
+};
