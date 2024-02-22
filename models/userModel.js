@@ -68,6 +68,17 @@ const userSchema = new mongoose.Schema({
     select: false,
   },
 });
+
+/**
+ * This query middleware  adds {active: true} to the find Object of every query
+ * involving a find operation
+ * it executes before any other find query is executed
+ */
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: true });
+  next();
+});
+
 /**
  * NOTE: below are two middlewares performing the same operation which is saving/updating password
  * But only one middleware is executed at a given time.
