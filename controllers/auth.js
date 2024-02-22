@@ -128,6 +128,10 @@ exports.isLoggedIn = async (req, res, next) => {
       statusCode = 401;
       throw new Error('Invalid User!');
     }
+
+    //check if the account is deactivated
+    if (!user.active)
+      throw new Error(`Account has been deactivated!.Login again to activate`);
     if (user.passwordChangedAfter(iat))
       throw new Error('Your password was changed! You need to login again');
     req.user = user;
