@@ -283,10 +283,6 @@ exports.changePassword = async (req, res) => {
     if (!newPassword || !newPasswordConfirm || !oldPassword)
       throw new Error('Insufficient data');
 
-    //if new password and its confirmation have a mismatch throw Error
-    if (newPassword !== newPasswordConfirm)
-      throw new Error('New passwords mismatch!');
-
     //Compare the  old password with the one stored in database
     if (!(await user.passwordMatch(req.body.oldPassword, user.password)))
       throw new Error('Your password is incorrect');
@@ -294,6 +290,7 @@ exports.changePassword = async (req, res) => {
     //On successfull authentication save the new password
     //a pre-save hook will encrypt the password before it is saved to db
     user.password = newPassword;
+    user.passwordConfirm = newPasswordConfirm;
 
     //save the changes
     await user.save();
