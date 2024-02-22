@@ -277,14 +277,14 @@ exports.changePassword = async (req, res) => {
     const user = await User.findOne({ _id: req.user._id }).select('+password');
 
     //retrieve the old password, new password, and a confirmation for new password
-    const { newPassword, newPasswordConfirm, oldPassword } = req.body;
+    const { newPassword, newPasswordConfirm, currentPassword } = req.body;
 
     //if either of the passswords is not provided throw error
-    if (!newPassword || !newPasswordConfirm || !oldPassword)
+    if (!newPassword || !newPasswordConfirm || !currentPassword)
       throw new Error('Insufficient data');
 
     //Compare the  old password with the one stored in database
-    if (!(await user.passwordMatch(req.body.oldPassword, user.password)))
+    if (!(await user.passwordMatch(req.body.currentPassword, user.password)))
       throw new Error('Your password is incorrect');
 
     //On successfull authentication save the new password
