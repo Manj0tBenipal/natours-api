@@ -59,3 +59,31 @@ exports.deleteUser = async (req, res) => {
     });
   }
 };
+exports.updateMe = async (req, res) => {
+  try {
+    //User needs to successfully pass isLoggedIn middleware to update name and email
+    //isLoggedIn then will add a user Object to the query
+    const { user } = req;
+
+    //only allow updating name and email
+    //password is updated with a different route handler
+    const { name, email } = req.body;
+
+    //either name or email should be in the req body
+    if (!name && !email) throw new Error('Insufficient Data!');
+    user.name = name;
+    user.email = email;
+    await user.save();
+    res.status(200).json({
+      status: 'success',
+      data: {
+        updatedUser: user._id,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'failed',
+      err: { ...err },
+    });
+  }
+};
