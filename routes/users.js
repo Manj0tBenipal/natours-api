@@ -27,9 +27,8 @@ router
   .route('/')
   .get(isLoggedIn, modifyQueryToFilterObjSyntax, getAllUsers)
   .patch(isLoggedIn, updateMe);
-//This Update route for now does not ask user for their previous credentials
-//It is being developed temporarily to test if  pre-save hooks change lastPasswordChange in database
-//Future enhancement to the delete route will include checking the roles of the users before giving access to the route
+//The update and delete user routes will be made avaiable to users with role='admin'
+//users with role 'customer' will have routes to deactivate account and update their details
 router
   .route('/:id')
   // .patch(allowAccessTo('admin'), updateUser)
