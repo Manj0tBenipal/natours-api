@@ -62,6 +62,11 @@ const userSchema = new mongoose.Schema({
     select: false,
     default: 'customer',
   },
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 /**
  * NOTE: below are two middlewares performing the same operation which is saving/updating password
