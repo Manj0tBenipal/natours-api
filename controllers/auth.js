@@ -59,7 +59,6 @@ exports.login = async (req, res) => {
     //Error is thrown on password mismatch
     if (!passwordMatch)
       throw new Error('Authentication failed!. Incorrect email or passowrd');
-
     const token = signJWT(user._id);
     // A sucess res is sent when all the auth steps are completed
     res.status(200).json({
@@ -123,7 +122,7 @@ exports.isLoggedIn = async (req, res, next) => {
 
     //Check if the user exists using the id from payload
     //if not throw an Error
-    const user = await User.findById(id).select('+role');
+    const user = await User.findById(id).select('+role +active');
     if (!user) {
       statusCode = 401;
       throw new Error('Invalid User!');
