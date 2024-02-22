@@ -87,3 +87,41 @@ exports.updateMe = async (req, res) => {
     });
   }
 };
+
+exports.deactivateAccount = async (req, res) => {
+  try {
+    //isLoggedIn middleware needs to be executed successfully
+    //to access this route handler. isLoggedIn also adds the user object
+    //of the user currently logged in to the reqest object
+
+    const user = await User.findById(req.user._id).select('+password');
+    //deactivating account requires user to send currentPassword inthe request body
+    const { password } = req.body;
+    if (!password)
+      throw new Error('Password is required to deactivate the account!');
+
+    //check if the user has entered the correct password
+    if (!(await user.passwordMatch(password, user.password)))
+      throw new Error('Authentication failed! Incorrect Password!');
+    //if user is authenticated successfully deactivate the account
+
+    user.active = false;
+    //Since the value of activate is set to false by the routeHandler
+    //not the user, validation is not required
+    await user.save({
+      validateBeforeSave: false,
+    });
+
+    res.status(200).json({
+      status: 'failed',
+      data: {
+        deactivateUser: user._id,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'failed',
+      err: err.message,
+    });
+  }
+};
