@@ -6,6 +6,7 @@ const {
   allowAccessTo,
   forgotPassword,
   resetPassword,
+  changePassword,
 } = require('../controllers/auth');
 const { getAllUsers, updateUser, deleteUser } = require('../controllers/users');
 const { modifyQueryToFilterObjSyntax } = require('../utils/functions');
@@ -16,8 +17,8 @@ router.post('/signup', signup);
 router.post('/login', login);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
+router.post('/change-password', isLoggedIn, changePassword);
 router.route('/').get(isLoggedIn, modifyQueryToFilterObjSyntax, getAllUsers);
-
 //This Update route for now does not ask user for their previous credentials
 //It is being developed temporarily to test if  pre-save hooks change lastPasswordChange in database
 //Future enhancement to the delete route will include checking the roles of the users before giving access to the route
