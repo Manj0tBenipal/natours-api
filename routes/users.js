@@ -13,6 +13,7 @@ const {
   //  updateUser,
   deleteUser,
   updateMe,
+  deactivateAccount,
 } = require('../controllers/users');
 const { modifyQueryToFilterObjSyntax } = require('../utils/functions');
 
@@ -23,6 +24,7 @@ router.post('/login', login);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
 router.post('/change-password', isLoggedIn, changePassword);
+router.post('/deactivate-account', isLoggedIn, deactivateAccount);
 router
   .route('/')
   .get(isLoggedIn, modifyQueryToFilterObjSyntax, getAllUsers)
