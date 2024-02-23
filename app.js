@@ -3,6 +3,7 @@ const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const tourRouter = require(`${__dirname}/routes/tours.js`);
 
@@ -19,6 +20,17 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/api', limiter);
 app.use(mongoSanitize());
 app.use(xss());
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+    ],
+  }),
+);
 app.use(express.json());
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tours', tourRouter);
