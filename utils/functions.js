@@ -53,7 +53,15 @@ exports.convertToInteger = (input) => {
  * @param {String} id
  * @returns signed JWT
  */
-exports.signJWT = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, {
+exports.signJWT = (id, res) => {
+  const cookieOptions = {
+    httpOnly: true,
+    expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+  };
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+  const token = jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
   });
+  res.cookie('jwt', token, cookieOptions);
+  return token;
+};
