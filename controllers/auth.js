@@ -14,7 +14,7 @@ exports.signup = async (req, res) => {
       passwordConfirm: userData.passwordConfirm,
       photo: userData.photo,
     });
-    const token = signJWT(newUser._id);
+    const token = signJWT(newUser._id, res);
     res.status(201).json({
       status: 'success',
       token,
@@ -59,7 +59,7 @@ exports.login = async (req, res) => {
     //Error is thrown on password mismatch
     if (!passwordMatch)
       throw new Error('Authentication failed!. Incorrect email or passowrd');
-    const token = signJWT(user._id);
+    const token = signJWT(user._id, res);
     // A sucess res is sent when all the auth steps are completed
     res.status(200).json({
       status: 'success',
