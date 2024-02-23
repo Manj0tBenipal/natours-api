@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 
 const tourRouter = require(`${__dirname}/routes/tours.js`);
 
@@ -31,6 +32,7 @@ app.use(
     ],
   }),
 );
+app.use(cookieParser());
 app.use(express.json());
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tours', tourRouter);
