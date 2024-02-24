@@ -122,7 +122,7 @@ exports.isLoggedIn = async (req, res, next) => {
 
     //Check if the user exists using the id from payload
     //if not throw an Error
-    const user = await User.findById(id).select('+role +active');
+    const user = await User.findById(id).select('+active');
     if (!user) {
       statusCode = 401;
       throw new Error('Invalid User!');
