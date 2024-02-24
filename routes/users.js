@@ -29,8 +29,8 @@ router
   .route('/')
   .get(isLoggedIn, modifyQueryToFilterObjSyntax, getAllUsers)
   .patch(isLoggedIn, updateMe);
-//The update and delete user routes will be made avaiable to users with role='admin'
-//users with role 'customer' will have routes to deactivate account and update their details
+
+//Routes to update and delete User documents but are only accessible by admin
 router
   .route('/:id')
   .patch(isLoggedIn, allowAccessTo('admin'), updateUser)
