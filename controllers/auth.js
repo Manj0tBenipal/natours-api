@@ -156,11 +156,10 @@ exports.isLoggedIn = async (req, res, next) => {
  */
 exports.allowAccessTo =
   (...allowedRoles) =>
-  (req, res, next) => {
+  async (req, res, next) => {
     try {
-      const userRole = req.user.role;
-      if (!allowedRoles.includes(userRole))
-        throw new Error('Access restricted');
+      const { role } = await User.findById(req.user._id).select('+role');
+      if (!allowedRoles.includes(role)) throw new Error('Access restricted');
       next();
     } catch (err) {
       res.status(401).json({
