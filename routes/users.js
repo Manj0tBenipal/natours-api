@@ -10,7 +10,7 @@ const {
 } = require('../controllers/auth');
 const {
   getAllUsers,
-  //  updateUser,
+  updateUser,
   deleteUser,
   updateMe,
   deactivateAccount,
@@ -33,6 +33,6 @@ router
 //users with role 'customer' will have routes to deactivate account and update their details
 router
   .route('/:id')
-  // .patch(allowAccessTo('admin'), updateUser)
+  .patch(isLoggedIn, allowAccessTo('admin'), updateUser)
   .delete(isLoggedIn, allowAccessTo('admin'), deleteUser);
 module.exports = router;
