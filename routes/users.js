@@ -14,6 +14,7 @@ const {
   deleteUser,
   updateMe,
   deactivateAccount,
+  activateAccount,
 } = require('../controllers/users');
 const { modifyQueryToFilterObjSyntax } = require('../utils/functions');
 
@@ -24,6 +25,7 @@ router.post('/login', login);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
 router.post('/change-password', isLoggedIn, changePassword);
+router.post('/activate-account', activateAccount);
 router.post('/deactivate-account', isLoggedIn, deactivateAccount);
 router
   .route('/')
