@@ -149,7 +149,8 @@ exports.activateAccount = async (req, res) => {
     //verify the credentials
     if (!(await user.passwordMatch(password, user.password)))
       throw new Error('Invalid Username or password');
-
+    if (user.active)
+      throw new Error('Your account is already active! Please login');
     //change status of account from inactive to active
     user.active = true;
 
