@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const APIFeatures = require('../utils/APIFeatures');
+const { signJWT } = require('../utils/functions');
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -120,6 +121,53 @@ exports.deactivateAccount = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({
+      status: 'failed',
+      err: err.message,
+    });
+  }
+};
+exports.activateAccount = async (req, res) => {
+  try {
+    //retrieve credentials from req.body
+    const { email, password } = req.body;
+
+    //check if both email and password are provided in req.body
+    if (!email || !password) throw new Error('Insufficient Data!');
+
+    //find the user based on email address
+    /**
+     * NOTE: there is a middleware which executes before each find query
+     */
+    const user = await User.findOne({
+      email: email,
+      includeInactive: true,
+    }).select('+password +active');
+
+    //check if with same email is found
+    if (!user) throw new Error('Invalid Username or password');
+
+    //verify the credentials
+    if (!(await user.passwordMatch(password, user.password)))
+      throw new Error('Invalid Username or password');
+
+    //change status of account from inactive to active
+    user.active = true;
+
+    //save changes
+    await user.save({
+      validateBeforeSave: false,
+    });
+
+    //create a new JWT and attach it to the res object as a cookie
+    signJWT(user._id, res);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        activatedUser: user._id,
+      },
+    });
+  } catch (err) {
+    res.status(401).json({
       status: 'failed',
       err: err.message,
     });
