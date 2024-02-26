@@ -1,6 +1,5 @@
 const mongoose = require(`mongoose`);
 // const slugify = require('slugify');
-
 const toursSchema = new mongoose.Schema(
   {
     name: {
@@ -92,6 +91,29 @@ const toursSchema = new mongoose.Schema(
     slug: String,
     startDates: [Date],
     secretTour: Boolean,
+    startLocation: {
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
   },
   //Schema options to include virtual properties in the result
   {
