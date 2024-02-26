@@ -24,6 +24,11 @@ const reviewSchema = new mongoose.Schema({
   createdAt: Date,
 });
 
+/**
+ * Assigns value to createdAt field in Review,
+ * Even if user provides this field in order to manipulate createdAt manually
+ * it will be overriden by this pre-save hook
+ */
 reviewSchema.pre('save', function (next) {
   if (!this.isNew) return next();
   this.createdAt = Date.now();
