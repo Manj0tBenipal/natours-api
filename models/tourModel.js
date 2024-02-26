@@ -1,5 +1,4 @@
 const mongoose = require(`mongoose`);
-const User = require('./userModel');
 // const slugify = require('slugify');
 const toursSchema = new mongoose.Schema(
   {
@@ -130,28 +129,6 @@ const toursSchema = new mongoose.Schema(
 );
 
 /**
- * This pre-save middleware uses the guides array provided in the req obj when
- * creating an new Tour Doc.
- * The array contains userIds and this middlware will find the users using those ids and
- * replace this.guides with User docs to resemble embedded data model
- */
-toursSchema.pre('save', async function (next) {
-  try {
-    if (this.isNew) {
-      //storing promises returned by .map
-      const guidesDocsPromises = this.guides.map(
-        async (el) => await User.findOne({ _id: el }),
-      );
-      const guidesDocs = await Promise.all(guidesDocsPromises);
-      //omitting any null values if provided ids don't map to a user
-      this.guides = guidesDocs.filter((el) => el);
-    }
-  } catch (err) {
-    next(err);
-  }
-  next();
-});
-/**
  * Excludes the tours that have  been marked as secret
  * A query middleware using a regex to execute on any query that use the word find
  */
@@ -159,7 +136,18 @@ toursSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
   next();
 });
-
+/**
+ * Excludes __v field from all results from find queries
+ * When Querying tours, the userIds in guides field are populated
+ */
+toursSchema.pre(/^find/, function (next) {
+  //
+  this.select('-__v');
+  this.populate({
+    path: 'guides',
+  });
+  next();
+});
 //Virtual Property calculated on the fly
 toursSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
