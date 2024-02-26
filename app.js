@@ -7,7 +7,7 @@ const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 
 const tourRouter = require(`${__dirname}/routes/tours.js`);
-
+const reviewRouter = require(`${__dirname}/routes/review.js`);
 const userRouter = require(`${__dirname}/routes/users.js`);
 const limiter = rateLimit({
   max: 100,
@@ -36,5 +36,6 @@ app.use(cookieParser());
 app.use(express.json());
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 module.exports = app;
