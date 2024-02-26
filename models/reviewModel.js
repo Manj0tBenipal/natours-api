@@ -26,6 +26,11 @@ const reviewSchema = new mongoose.Schema({
   createdAt: Date,
 });
 
+//removed unused fields from the query selection
+reviewSchema.pre(/^find/, function (next) {
+  this.select('-__v');
+  next();
+});
 /**
  * Assigns value to createdAt field in Review,
  * Even if user provides this field in order to manipulate createdAt manually
@@ -36,5 +41,5 @@ reviewSchema.pre('save', function (next) {
   this.createdAt = Date.now();
   next();
 });
-const Review = mongoose.model(reviewSchema);
+const Review = mongoose.model('Review', reviewSchema);
 module.exports = Review;
