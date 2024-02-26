@@ -114,6 +114,7 @@ const toursSchema = new mongoose.Schema(
         day: Number,
       },
     ],
+    guides: Array,
   },
   //Schema options to include virtual properties in the result
   {
