@@ -10,10 +10,12 @@ const reviewSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.ObjectId,
     reference: 'User',
+    required: [true, 'Review must belong to a user'],
   },
   tourId: {
     type: mongoose.Schema.ObjectId,
     reference: 'Tour',
+    required: [true, 'Review must belong to a tour'],
   },
   rating: {
     type: Number,
