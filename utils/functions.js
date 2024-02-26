@@ -65,3 +65,16 @@ exports.signJWT = (id, res) => {
   res.cookie('jwt', token, cookieOptions);
   return token;
 };
+
+/**
+ * This function filters and object based on an array of keys provided
+ * All the keys that are not in the Array but are in object will be deleted
+ * @param {Object} object
+ * @param {[String]} allowedKeys
+ */
+exports.filterObject = (object, allowedKeys) => {
+  Object.keys(object).forEach((key) => {
+    if (!allowedKeys.includes(key)) delete object[key];
+  });
+  return object;
+};
