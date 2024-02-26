@@ -115,7 +115,12 @@ const toursSchema = new mongoose.Schema(
         day: Number,
       },
     ],
-    guides: Array,
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   //Schema options to include virtual properties in the result
   {
@@ -150,18 +155,11 @@ toursSchema.pre('save', async function (next) {
  * Excludes the tours that have  been marked as secret
  * A query middleware using a regex to execute on any query that use the word find
  */
-toursSchema.pre(/^find/, function () {
-  this.start = Date.now();
+toursSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
-});
-/**
- * Excludes the tours that have  been marked as secret
- * A query middleware using a regex to execute on any query that use the word find
- */
-toursSchema.post(/^find/, function (docs, next) {
-  console.log(`Query took ${Date.now() - this.start} ms`);
   next();
 });
+
 //Virtual Property calculated on the fly
 toursSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
