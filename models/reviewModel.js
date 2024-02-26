@@ -24,5 +24,10 @@ const reviewSchema = new mongoose.Schema({
   createdAt: Date,
 });
 
+reviewSchema.pre('save', function (next) {
+  if (!this.isNew) return next();
+  this.createdAt = Date.now();
+  next();
+});
 const Review = mongoose.model(reviewSchema);
 module.exports = Review;
