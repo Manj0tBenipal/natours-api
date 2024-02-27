@@ -20,13 +20,14 @@ exports.getAllReviews = async (req, res) => {
 };
 exports.addReview = async (req, res) => {
   try {
+    const { id } = req.params;
     const allowedKeys = ['rating', 'text', 'userId', 'tourId'];
 
     //All the keys: value pairs that are not in the array are deleted from the object
     const filteredObject = filterObject(
       //assign the value of user._id which is generated while
       //authenticating user up in the middleware stack to userId to be used in newReview document
-      { ...req.body, userId: req.user._id },
+      { ...req.body, userId: req.user._id, tourId: id },
       allowedKeys,
     );
 

@@ -25,5 +25,8 @@ router
     tourController.deleteTour,
   );
 
-router.route('/:id/reviews').get(reviewController.getAllReviews);
+router
+  .route('/:id/reviews')
+  .get(reviewController.getAllReviews)
+  .post(isLoggedIn, allowAccessTo('customer'), reviewController.addReview);
 module.exports = router;
