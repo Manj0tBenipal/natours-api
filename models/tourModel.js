@@ -152,6 +152,12 @@ toursSchema.pre(/^find/, function (next) {
 toursSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
+
+toursSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tourId',
+  localField: '_id',
+});
 /**
  * Aggregation middleware
  * the aggregation pipeline if used will still process the documents containing the field secretTour=true
