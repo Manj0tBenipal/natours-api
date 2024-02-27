@@ -1,9 +1,9 @@
 const express = require('express');
 
 const tourController = require(`../controllers/tours`);
-const reviewController = require('../controllers/review');
 const { modifyQueryToFilterObjSyntax } = require('../utils/functions');
 const { isLoggedIn, allowAccessTo } = require('../controllers/auth');
+const reviewRouter = require('./review');
 
 const router = express.Router();
 router
@@ -25,9 +25,6 @@ router
     tourController.deleteTour,
   );
 
-router
-  .route('/:tourId/reviews')
-  .get(reviewController.getAllReviews)
-  .post(isLoggedIn, allowAccessTo('customer'), reviewController.addReview);
-router.route('/:tourId/reviews/:reviewId').get(reviewController.getReviewById);
+router.use('/:tourId/reviews', reviewRouter);
+router.use('/:tourId/reviews/:reviewId', reviewRouter);
 module.exports = router;
