@@ -26,8 +26,8 @@ router
   );
 
 router
-  .route('/:id/reviews')
+  .route('/:tourId/reviews')
   .get(reviewController.getAllReviews)
   .post(isLoggedIn, allowAccessTo('customer'), reviewController.addReview);
-router.route('/:id/reviews/:reviewId').get(reviewController.getReviewById);
+router.route('/:tourId/reviews/:reviewId').get(reviewController.getReviewById);
 module.exports = router;
