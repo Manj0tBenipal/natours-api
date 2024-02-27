@@ -1,5 +1,6 @@
 const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/APIFeatures');
+const { getResourceById } = require('./handlerFactory');
 
 exports.getTours = async (req, res) => {
   try {
@@ -21,25 +22,7 @@ exports.getTours = async (req, res) => {
     });
   }
 };
-exports.getTourById = async (req, res) => {
-  const { params } = req;
-  try {
-    const tour = await Tour.findById(`${params.id}`).populate('reviews');
-    if (!tour) {
-      throw new Error('404');
-    }
-    res.status(200).json({ status: 'success', data: tour });
-  } catch (err) {
-    const status = err.message === '404' ? 404 : 400;
-
-    res.status(status).json({
-      status: 'fail',
-      err:
-        status === 400 ? 'Document id is invalid ' : 'Document does not exist',
-    });
-  }
-};
-
+exports.getTourById = getResourceById(Tour);
 exports.addTour = async (req, res) => {
   const { body } = req;
   try {
