@@ -2,7 +2,10 @@ const Review = require('../models/reviewModel');
 const { filterObject } = require('../utils/functions');
 
 exports.getAllReviews = async (req, res) => {
-  const { tourId } = req.body || req.params;
+  //allow nested routes {/tours/:id/reviews}
+  const tourIdFromReq = req.body.tourId;
+  const tourIdFromParams = req.params.tourId;
+  const tourId = tourIdFromReq !== undefined ? tourIdFromReq : tourIdFromParams;
   try {
     const reviews = await Review.find({ tourId: tourId });
     res.status(200).json({
@@ -20,7 +23,11 @@ exports.getAllReviews = async (req, res) => {
 };
 exports.addReview = async (req, res) => {
   try {
-    const { tourId } = req.body || req.params;
+    //allow nested routes {/tours/:id/reviews}
+    const tourIdFromReq = req.body.tourId;
+    const tourIdFromParams = req.params.tourId;
+    const tourId =
+      tourIdFromReq !== undefined ? tourIdFromReq : tourIdFromParams;
     const allowedKeys = ['rating', 'text', 'userId', 'tourId'];
 
     //All the keys: value pairs that are not in the array are deleted from the object
@@ -47,8 +54,13 @@ exports.addReview = async (req, res) => {
 };
 exports.getReviewById = async (req, res) => {
   try {
-    const { reviewId } = req.body || req.params;
-    const { tourId } = req.body || req.params;
+    //allow nested routes {/tours/:id/reviews}
+    const tourIdFromReq = req.body.tourId;
+    const tourIdFromParams = req.params.tourId;
+    const tourId =
+      tourIdFromReq !== undefined ? tourIdFromReq : tourIdFromParams;
+
+    const { reviewId } = req.params;
     const review = await Review.findOne({ _id: reviewId, tourId: tourId });
     if (!review) throw new Error('No review found');
     res.status(200).json({
