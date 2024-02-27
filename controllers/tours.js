@@ -24,7 +24,7 @@ exports.getTours = async (req, res) => {
 exports.getTourById = async (req, res) => {
   const { params } = req;
   try {
-    const tour = await Tour.findById(`${params.id}`);
+    const tour = await Tour.findById(`${params.id}`).populate('reviews');
     if (!tour) {
       throw new Error('404');
     }
