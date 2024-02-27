@@ -45,3 +45,21 @@ exports.addReview = async (req, res) => {
     });
   }
 };
+exports.getReviewById = async (req, res) => {
+  try {
+    const { reviewId, id } = req.params;
+    const review = await Review.findOne({ _id: reviewId, tourId: id });
+    if (!review) throw new Error('No review found');
+    res.status(200).json({
+      status: 'success',
+      data: {
+        review,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'failed',
+      err: err.message,
+    });
+  }
+};

@@ -29,4 +29,5 @@ router
   .route('/:id/reviews')
   .get(reviewController.getAllReviews)
   .post(isLoggedIn, allowAccessTo('customer'), reviewController.addReview);
+router.route('/:id/reviews/:reviewId').get(reviewController.getReviewById);
 module.exports = router;
