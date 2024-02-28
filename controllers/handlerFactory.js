@@ -19,3 +19,22 @@ exports.getResourceById = (Model) => async (req, res) => {
     });
   }
 };
+
+exports.deleteResourceById = (Model) => async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await Model.findOneAndDelete({ _id: id });
+    if (!user) throw new Error('Invalid DocumentID');
+    res.status(200).json({
+      status: 'success',
+      data: {
+        deletedDoc: user._id,
+      },
+    });
+  } catch (err) {
+    res.status(401).json({
+      status: 'failed',
+      err: err.message,
+    });
+  }
+};
