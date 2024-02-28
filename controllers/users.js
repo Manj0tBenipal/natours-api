@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const APIFeatures = require('../utils/APIFeatures');
 const { signJWT } = require('../utils/functions');
+const { deleteResourceById } = require('./handlerFactory');
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -41,25 +42,7 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-exports.deleteUser = async (req, res) => {
-  try {
-    const { id } = req.params;
-    if (!id) throw new Error('Invalid UserID');
-    const user = await User.findOneAndDelete({ _id: id });
-    if (!user) throw new Error('Invalid UserID');
-    res.status(200).json({
-      status: 'success',
-      data: {
-        deletedUser: user._id,
-      },
-    });
-  } catch (err) {
-    res.status(401).json({
-      status: 'failed',
-      err: err.message,
-    });
-  }
-};
+exports.deleteUser = deleteResourceById(User);
 exports.updateMe = async (req, res) => {
   try {
     //User needs to successfully pass isLoggedIn middleware to update name and email

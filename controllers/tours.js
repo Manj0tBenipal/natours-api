@@ -1,6 +1,6 @@
 const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/APIFeatures');
-const { getResourceById } = require('./handlerFactory');
+const { getResourceById, deleteResourceById } = require('./handlerFactory');
 
 exports.getTours = async (req, res) => {
   try {
@@ -72,28 +72,7 @@ exports.updateTour = async (req, res) => {
     });
   }
 };
-exports.deleteTour = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const data = await Tour.deleteOne({ _id: id });
-    if (data.deletedCount === 0) {
-      throw new Error('400');
-    }
-    res.status(204).json({
-      status: 'success',
-      data: { data },
-    });
-  } catch (err) {
-    const status = err.message === '400' ? 400 : 500;
-    res.status(status).json({
-      status: 'fail',
-      err:
-        status === 400
-          ? 'Document does not exist'
-          : 'failed to delete document',
-    });
-  }
-};
+exports.deleteTour = deleteResourceById(Tour);
 
 exports.aliasTopFiveTours = (req, res, next) => {
   req.query = { limit: '5', sort: 'ratingsAverage' };
