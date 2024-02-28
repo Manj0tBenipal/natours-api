@@ -26,5 +26,5 @@ router
   );
 
 router.use('/:tourId/reviews', reviewRouter);
-router.use('/:tourId/reviews/:reviewId', reviewRouter);
+router.use('/:tourId/reviews/:id', reviewRouter);
 module.exports = router;

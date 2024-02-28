@@ -1,5 +1,6 @@
 const Review = require('../models/reviewModel');
 const { filterObject } = require('../utils/functions');
+const { getResourceById } = require('./handlerFactory');
 
 exports.getAllReviews = async (req, res) => {
   //allow nested routes {/tours/:id/reviews}
@@ -52,27 +53,4 @@ exports.addReview = async (req, res) => {
     });
   }
 };
-exports.getReviewById = async (req, res) => {
-  try {
-    //allow nested routes {/tours/:id/reviews}
-    const tourIdFromReq = req.body.tourId;
-    const tourIdFromParams = req.params.tourId;
-    const tourId =
-      tourIdFromReq !== undefined ? tourIdFromReq : tourIdFromParams;
-
-    const { reviewId } = req.params;
-    const review = await Review.findOne({ _id: reviewId, tourId: tourId });
-    if (!review) throw new Error('No review found');
-    res.status(200).json({
-      status: 'success',
-      data: {
-        review,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: 'failed',
-      err: err.message,
-    });
-  }
-};
+exports.getReviewById = getResourceById(Review);
