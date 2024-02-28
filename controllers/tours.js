@@ -1,6 +1,10 @@
 const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/APIFeatures');
-const { getResourceById, deleteResourceById } = require('./handlerFactory');
+const {
+  getResourceById,
+  deleteResourceById,
+  updateResource,
+} = require('./handlerFactory');
 
 exports.getTours = async (req, res) => {
   try {
@@ -41,37 +45,19 @@ exports.addTour = async (req, res) => {
     });
   }
 };
-exports.updateTour = async (req, res) => {
-  const { params, body } = req;
-  try {
-    const data = await Tour.findOneAndUpdate(
-      { _id: params.id },
-      { $set: { ...body } },
-      { runValidators: true, new: true },
-    );
-    if (data.matchedCount === 0) {
-      throw new Error('400');
-    }
-    res.status(200).json({
-      status: 'success',
-      data: {
-        data,
-      },
-    });
-  } catch (err) {
-    const status = err.message === '400' ? 400 : 500;
-    res.status(status).json({
-      status: 'fail',
-      err:
-        status === 400
-          ? 'Document not found'
-          : {
-              type: err.name,
-              message: err.message,
-            },
-    });
-  }
-};
+exports.updateTour = updateResource(Tour, [
+  'name',
+  'price',
+  'duration',
+  'difficulty',
+  'summary',
+  'description',
+  'imageCover',
+  'images',
+  'startDates',
+  'locations',
+  'guides',
+]);
 exports.deleteTour = deleteResourceById(Tour);
 
 exports.aliasTopFiveTours = (req, res, next) => {

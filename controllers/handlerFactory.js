@@ -1,3 +1,5 @@
+const { filterObject } = require('../utils/functions');
+
 exports.getResourceById = (Model) => async (req, res) => {
   try {
     const { id } = req.params;
@@ -35,6 +37,40 @@ exports.deleteResourceById = (Model) => async (req, res) => {
     res.status(401).json({
       status: 'failed',
       err: err.message,
+    });
+  }
+};
+
+exports.updateResource = (Model, allowedKeys) => async (req, res) => {
+  const { id } = req.params;
+  const updatedData = filterObject(req.body, allowedKeys);
+  try {
+    const data = await Model.findOneAndUpdate(
+      { _id: id },
+      { $set: { ...updatedData } },
+      { runValidators: true, new: true },
+    );
+    console.log(data);
+    if (data.matchedCount === 0) {
+      throw new Error('400');
+    }
+    res.status(200).json({
+      status: 'success',
+      data: {
+        data,
+      },
+    });
+  } catch (err) {
+    const status = err.message === '400' ? 400 : 500;
+    res.status(status).json({
+      status: 'fail',
+      err:
+        status === 400
+          ? 'Document not found'
+          : {
+              type: err.name,
+              message: err.message,
+            },
     });
   }
 };

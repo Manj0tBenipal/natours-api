@@ -1,7 +1,7 @@
 const User = require('../models/userModel');
 const APIFeatures = require('../utils/APIFeatures');
 const { signJWT } = require('../utils/functions');
-const { deleteResourceById } = require('./handlerFactory');
+const { deleteResourceById, updateResource } = require('./handlerFactory');
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -18,30 +18,7 @@ exports.getAllUsers = async (req, res) => {
     });
   }
 };
-exports.updateUser = async (req, res) => {
-  try {
-    const { params, body } = req;
-    if (!params.id) throw new Error('Provide a userID');
-    //future enhancement will sanitize the incoming object to filter unnecessary fields
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: params.id },
-      { $set: { ...body } },
-      { new: true },
-    );
-    res.status(200).json({
-      status: 'success',
-      data: {
-        user: updatedUser,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: 'failed',
-      err: err.message,
-    });
-  }
-};
-
+exports.updateUser = updateResource(User, ['name', 'email', 'role']);
 exports.deleteUser = deleteResourceById(User);
 exports.updateMe = async (req, res) => {
   try {
