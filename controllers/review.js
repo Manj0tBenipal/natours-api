@@ -27,5 +27,10 @@ exports.addTourAndUserId = (req, res, next) => {
   req.body.userId = req.user._id;
   next();
 };
-
+exports.addReview = createResource(Review, [
+  'userId',
+  'tourId',
+  'text',
+  'rating',
+]);
 exports.getReviewById = getResourceById(Review);
