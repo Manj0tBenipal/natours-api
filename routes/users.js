@@ -15,6 +15,8 @@ const {
   updateMe,
   deactivateAccount,
   activateAccount,
+  addUserIdToParams,
+  getMe,
 } = require('../controllers/users');
 const { modifyQueryToFilterObjSyntax } = require('../utils/functions');
 
@@ -37,4 +39,5 @@ router
   .route('/:id')
   .patch(isLoggedIn, allowAccessTo('admin'), updateUser)
   .delete(isLoggedIn, allowAccessTo('admin'), deleteUser);
+router.get('/me', isLoggedIn, addUserIdToParams, getMe);
 module.exports = router;

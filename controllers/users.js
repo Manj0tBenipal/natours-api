@@ -4,6 +4,7 @@ const {
   deleteResourceById,
   updateResource,
   getResources,
+  getResourceById,
 } = require('./handlerFactory');
 
 exports.getAllUsers = getResources(User);
@@ -13,7 +14,7 @@ exports.addUserIdToParams = (req, res, next) => {
   req.params.id = req.user._id;
   next();
 };
-
+exports.getMe = getResourceById(User);
 exports.updateMe = async (req, res) => {
   try {
     //User needs to successfully pass isLoggedIn middleware to update name and email
