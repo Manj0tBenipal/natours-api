@@ -1,5 +1,11 @@
 const { filterObject } = require('../utils/functions');
 
+/**
+ * This function fetches a document from the given Model using document id
+ * provided in req.params
+ * @param {Mongoose.model} Model 
+
+ */
 exports.getResourceById = (Model) => async (req, res) => {
   try {
     const { id } = req.params;
@@ -22,6 +28,11 @@ exports.getResourceById = (Model) => async (req, res) => {
   }
 };
 
+/**
+ * This function deletes a document from the provided Model using the document id
+ * from req.params
+ * @param {Mongoose.model} Model
+ */
 exports.deleteResourceById = (Model) => async (req, res) => {
   try {
     const { id } = req.params;
@@ -41,6 +52,12 @@ exports.deleteResourceById = (Model) => async (req, res) => {
   }
 };
 
+/**
+ * This function ubdates a recource in provided model using  data from req.body
+ * The data is filtered using the allowedKeysArray
+ * @param {Mongoose.model} Model
+ * @param {String[]} allowedKeys
+ */
 exports.updateResource = (Model, allowedKeys) => async (req, res) => {
   const { id } = req.params;
   const updatedData = filterObject(req.body, allowedKeys);
@@ -50,7 +67,6 @@ exports.updateResource = (Model, allowedKeys) => async (req, res) => {
       { $set: { ...updatedData } },
       { runValidators: true, new: true },
     );
-    console.log(data);
     if (data.matchedCount === 0) {
       throw new Error('400');
     }
@@ -71,6 +87,30 @@ exports.updateResource = (Model, allowedKeys) => async (req, res) => {
               type: err.name,
               message: err.message,
             },
+    });
+  }
+};
+/**
+ * This method creates a new document using the data provided in the req.body
+ * The incoming data is filtered based on the provided array of allowedKeys
+ * @param {Mongoose.model} Model
+ * @param {String[]} allowedKeys only object keys specified in this array are allowed to be added into db
+ */
+exports.createResource = (Model, allowedKeys) => async (req, res) => {
+  const { body } = req;
+  try {
+    const data = await Model.create({
+      ...filterObject(body, allowedKeys),
+    });
+    res.status(201).json({ status: 'suceess', data: { data } });
+  } catch (err) {
+    res.status(400).json({
+      err: {
+        type: err.name,
+        message: err.message,
+      },
+      status: 'fail',
+      message: 'falied to save document',
     });
   }
 };
