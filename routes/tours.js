@@ -1,29 +1,29 @@
 const express = require('express');
 
-const tourController = require(`../controllers/tours`);
+const {
+  getTourById,
+  getTours,
+  addTour,
+  aliasTopFiveTours,
+  getToursStats,
+  getMonthlyPlan,
+  deleteTour,
+  updateTour,
+} = require(`../controllers/tours`);
 const { modifyQueryToFilterObjSyntax } = require('../utils/functions');
 const { isLoggedIn, allowAccessTo } = require('../controllers/auth');
 const reviewRouter = require('./review');
 
 const router = express.Router();
-router
-  .route('/')
-  .get(modifyQueryToFilterObjSyntax, tourController.getTours)
-  .post(tourController.addTour);
-router
-  .route('/top-five-tours')
-  .get(tourController.aliasTopFiveTours, tourController.getTours);
-router.route('/stats').get(tourController.getToursStats);
-router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
+router.route('/').get(modifyQueryToFilterObjSyntax, getTours).post(addTour);
+router.route('/top-five-tours').get(aliasTopFiveTours, getTours);
+router.route('/stats').get(getToursStats);
+router.route('/monthly-plan/:year').get(getMonthlyPlan);
 router
   .route('/:id')
-  .get(tourController.getTourById)
-  .patch(tourController.updateTour)
-  .delete(
-    isLoggedIn,
-    allowAccessTo('admin', 'lead-guide'),
-    tourController.deleteTour,
-  );
+  .get(getTourById)
+  .patch(updateTour)
+  .delete(isLoggedIn, allowAccessTo('admin', 'lead-guide'), deleteTour);
 
 router.use('/:tourId/reviews', reviewRouter);
 router.use('/:tourId/reviews/:id', reviewRouter);
