@@ -4,8 +4,22 @@ const {
   getResourceById,
   deleteResourceById,
   updateResource,
+  createResource,
 } = require('./handlerFactory');
 
+const allowedKeys = [
+  'name',
+  'price',
+  'duration',
+  'difficulty',
+  'summary',
+  'description',
+  'imageCover',
+  'images',
+  'startDates',
+  'locations',
+  'guides',
+];
 exports.getTours = async (req, res) => {
   try {
     const fetchTours = new APIFeatures(Tour, req.query);
@@ -27,37 +41,8 @@ exports.getTours = async (req, res) => {
   }
 };
 exports.getTourById = getResourceById(Tour);
-exports.addTour = async (req, res) => {
-  const { body } = req;
-  try {
-    const data = await Tour.create({
-      ...body,
-    });
-    res.status(201).json({ status: 'suceess', data: { data } });
-  } catch (err) {
-    res.status(400).json({
-      err: {
-        type: err.name,
-        message: err.message,
-      },
-      status: 'fail',
-      message: 'falied to save document',
-    });
-  }
-};
-exports.updateTour = updateResource(Tour, [
-  'name',
-  'price',
-  'duration',
-  'difficulty',
-  'summary',
-  'description',
-  'imageCover',
-  'images',
-  'startDates',
-  'locations',
-  'guides',
-]);
+exports.addTour = createResource(Tour, allowedKeys);
+exports.updateTour = updateResource(Tour, allowedKeys);
 exports.deleteTour = deleteResourceById(Tour);
 
 exports.aliasTopFiveTours = (req, res, next) => {
