@@ -15,14 +15,23 @@ const { isLoggedIn, allowAccessTo } = require('../controllers/auth');
 const reviewRouter = require('./review');
 
 const router = express.Router();
-router.route('/').get(modifyQueryToFilterObjSyntax, getTours).post(addTour);
+router
+  .route('/')
+  .get(modifyQueryToFilterObjSyntax, getTours)
+  .post(isLoggedIn, allowAccessTo('admin', 'lead-guide'), addTour);
 router.route('/top-five-tours').get(aliasTopFiveTours, getTours);
 router.route('/stats').get(getToursStats);
-router.route('/monthly-plan/:year').get(getMonthlyPlan);
+router
+  .route(
+    isLoggedIn,
+    allowAccessTo('admin', 'lead-guide', 'guide'),
+    '/monthly-plan/:year',
+  )
+  .get(getMonthlyPlan);
 router
   .route('/:id')
   .get(getTourById)
-  .patch(updateTour)
+  .patch(isLoggedIn, allowAccessTo('admin', 'lead-guide'), updateTour)
   .delete(isLoggedIn, allowAccessTo('admin', 'lead-guide'), deleteTour);
 
 router.use('/:tourId/reviews', reviewRouter);
