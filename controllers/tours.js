@@ -1,10 +1,10 @@
 const Tour = require('../models/tourModel');
-const APIFeatures = require('../utils/APIFeatures');
 const {
   getResourceById,
   deleteResourceById,
   updateResource,
   createResource,
+  getResources,
 } = require('./handlerFactory');
 
 const allowedKeys = [
@@ -20,26 +20,7 @@ const allowedKeys = [
   'locations',
   'guides',
 ];
-exports.getTours = async (req, res) => {
-  try {
-    const fetchTours = new APIFeatures(Tour, req.query);
-
-    const tours = await fetchTours.execute();
-    res.status(200).json({
-      status: 'success',
-      ...tours,
-    });
-  } catch (err) {
-    res.status(500).json({
-      err: {
-        type: err.name,
-        message: err.message,
-      },
-      status: 'fail',
-      message: 'falied to get Documents',
-    });
-  }
-};
+exports.getTours = getResources(Tour);
 exports.getTourById = getResourceById(Tour);
 exports.addTour = createResource(Tour, allowedKeys);
 exports.updateTour = updateResource(Tour, allowedKeys);

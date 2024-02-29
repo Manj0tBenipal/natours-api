@@ -1,5 +1,26 @@
+const APIFeatures = require('../utils/APIFeatures');
 const { filterObject } = require('../utils/functions');
 
+/**
+ * This function returns all the documents in a collection
+ * The results are filtetred using methods in APIFeatures class
+ * @param {Mongoose.model} Model
+ */
+exports.getResources = (Model) => async (req, res) => {
+  try {
+    const fetchUsers = new APIFeatures(Model, req.query);
+    const users = await fetchUsers.execute();
+    res.status(200).json({
+      status: 'success',
+      ...users,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'failed',
+      err,
+    });
+  }
+};
 /**
  * This function fetches a document from the given Model using document id
  * provided in req.params

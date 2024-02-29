@@ -1,23 +1,12 @@
 const User = require('../models/userModel');
-const APIFeatures = require('../utils/APIFeatures');
 const { signJWT } = require('../utils/functions');
-const { deleteResourceById, updateResource } = require('./handlerFactory');
+const {
+  deleteResourceById,
+  updateResource,
+  getResources,
+} = require('./handlerFactory');
 
-exports.getAllUsers = async (req, res) => {
-  try {
-    const fetchUsers = new APIFeatures(User, req.query);
-    const users = await fetchUsers.execute();
-    res.status(200).json({
-      status: 'success',
-      ...users,
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: 'failed',
-      err,
-    });
-  }
-};
+exports.getAllUsers = getResources(User);
 exports.updateUser = updateResource(User, ['name', 'email', 'role']);
 exports.deleteUser = deleteResourceById(User);
 exports.updateMe = async (req, res) => {
