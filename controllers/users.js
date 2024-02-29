@@ -9,6 +9,11 @@ const {
 exports.getAllUsers = getResources(User);
 exports.updateUser = updateResource(User, ['name', 'email', 'role']);
 exports.deleteUser = deleteResourceById(User);
+exports.addUserIdToParams = (req, res, next) => {
+  req.params.id = req.user._id;
+  next();
+};
+
 exports.updateMe = async (req, res) => {
   try {
     //User needs to successfully pass isLoggedIn middleware to update name and email
