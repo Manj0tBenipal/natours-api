@@ -27,27 +27,33 @@ exports.getResources = (Model) => async (req, res) => {
  * @param {Mongoose.model} Model 
 
  */
-exports.getResourceById = (Model) => async (req, res) => {
-  try {
-    const { id } = req.params;
-    const doc = await Model.findById(id);
-    if (!doc) {
-      throw new Error('404');
-    }
-    res.status(200).json({
-      status: 'success',
-      data: { [Model.modelName.toLowerCase()]: doc },
-    });
-  } catch (err) {
-    const status = err.message === '404' ? 404 : 400;
+exports.getResourceById =
+  (Model, options = {}) =>
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const query = Model.findById(id);
+      if (options.populate) query.populate({ ...options.populate });
+      const doc = await query;
+      if (!doc) {
+        throw new Error('404');
+      }
+      res.status(200).json({
+        status: 'success',
+        data: { [Model.modelName.toLowerCase()]: doc },
+      });
+    } catch (err) {
+      const status = err.message === '404' ? 404 : 400;
 
-    res.status(status).json({
-      status: 'fail',
-      err:
-        status === 400 ? 'Document id is invalid ' : 'Document does not exist',
-    });
-  }
-};
+      res.status(status).json({
+        status: 'fail',
+        err:
+          status === 400
+            ? 'Document id is invalid '
+            : 'Document does not exist',
+      });
+    }
+  };
 
 /**
  * This function deletes a document from the provided Model using the document id
