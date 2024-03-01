@@ -65,3 +65,23 @@ exports.deleteReview = async (req, res) => {
     });
   }
 };
+exports.verifyUserForOwnership = async (req, res, next) => {
+  try {
+    const { user } = req;
+    const { id } = req.params;
+    const userDoc = await User.findById(user._id).select('+role');
+    const review = await Review.findById(id);
+    if (!review) throw new Error('No review Found!');
+    //check if the user is owner of the review
+    //if not, check if admin is performing the action
+    if (!review.userId.equals(user._id))
+      if (userDoc.role !== 'admin')
+        throw new Error('You are not allowed to perform this action');
+    next();
+  } catch (err) {
+    res.status(401).json({
+      status: 'failed',
+      err: err.message,
+    });
+  }
+};
