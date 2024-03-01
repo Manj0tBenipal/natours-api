@@ -5,7 +5,9 @@ const {
   getReviewById,
   addTourAndUserId,
 
-  addTourIdToQuery, deleteReview,
+  addTourIdToQuery,
+  deleteReview,
+  verifyUserForOwnership,
 } = require('../controllers/review');
 const { isLoggedIn, allowAccessTo } = require('../controllers/auth');
 
@@ -20,5 +22,10 @@ router
 router
   .route('/:id')
   .get(getReviewById)
-  .delete(isLoggedIn, allowAccessTo('admin', 'user'), deleteReview);
+  .delete(
+    isLoggedIn,
+    allowAccessTo('admin', 'user'),
+    verifyUserForOwnership,
+    deleteReview,
+  );
 module.exports = router;
