@@ -14,12 +14,6 @@ const toursSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'price must be included'],
     },
-    rating: {
-      type: Number,
-      default: 4.5,
-      min: 0,
-      max: 5,
-    },
     duration: {
       type: Number,
       required: [true, 'Providing Duration is  mandatory '],
