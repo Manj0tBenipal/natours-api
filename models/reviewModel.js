@@ -76,11 +76,20 @@ reviewSchema.post('save', function () {
 });
 
 /**
- * When an existing review is updated this post-save hook calls
+ * When an existing review is updated or deleted using findOneAndUpdate/findOneAndDelete this post-save hook calls
  * static function of Review Model to calculate new values of ratingsAverage, ratingsQuantity
  * and saves it to the tour document
  */
-reviewSchema.post(/^findOneAnd/, function (next) {
+reviewSchema.post(/^findOneAnd/, function () {
+  this.constructor.calcRatingsAverage(this.tourId);
+});
+
+/**
+ * When an existing review is deleted this post-save hook calls
+ * static function of Review Model to calculate new values of ratingsAverage, ratingsQuantity
+ * and saves it to the tour document
+ */
+reviewSchema.post('deleteOne', function () {
   this.constructor.calcRatingsAverage(this.tourId);
 });
 const Review = mongoose.model('Review', reviewSchema);
