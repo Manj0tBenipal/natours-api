@@ -5,6 +5,7 @@ const {
   createResource,
   getResources,
   deleteResourceById,
+  updateResource,
 } = require('./handlerFactory');
 
 exports.getAllReviews = getResources(Review);
@@ -40,7 +41,7 @@ exports.addReview = createResource(Review, [
 ]);
 exports.getReviewById = getResourceById(Review);
 exports.deleteReview = deleteResourceById(Review);
-
+exports.updateReview = updateResource(Review, ['text', 'rating']);
 /**
  * This function is a middleware used for verifying ownership of a Review document
  * This verification is required when a review is being updated or deleted.
