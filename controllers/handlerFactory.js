@@ -80,7 +80,7 @@ exports.deleteResourceById = (Model) => async (req, res) => {
 };
 
 /**
- * This function ubdates a recource in provided model using  data from req.body
+ * This function updates a resource in provided model using  data from req.body
  * The data is filtered using the allowedKeysArray
  * @param {Mongoose.model} Model
  * @param {String[]} allowedKeys
