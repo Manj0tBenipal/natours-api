@@ -56,7 +56,7 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: {
-      values: ['customer', 'admin', 'guide', 'lead-guide'],
+      values: ['user', 'admin', 'guide', 'lead-guide'],
       message: 'Role can be either customer or admin',
     },
     select: false,

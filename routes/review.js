@@ -16,6 +16,6 @@ router
   //addTourAndUserId adds userId from req.user to req.body.userId
   //and if tourId is not provided in req.body, it assigns it from req.params
   //Thi is done to support adding review using nested routed and normal POST /reviews route
-  .post(isLoggedIn, allowAccessTo('customer'), addTourAndUserId, addReview);
+  .post(isLoggedIn, allowAccessTo('user'), addTourAndUserId, addReview);
 router.route('/:id').get(getReviewById);
 module.exports = router;
