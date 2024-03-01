@@ -80,8 +80,14 @@ reviewSchema.post('save', function () {
  * static function of Review Model to calculate new values of ratingsAverage, ratingsQuantity
  * and saves it to the tour document
  */
-reviewSchema.post(/^findOneAnd/, function () {
-  this.constructor.calcRatingsAverage(this.tourId);
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  try {
+    const doc = await this.model.findById(this._conditions._id);
+    this.model.calcRatingsAverage(doc.tourId);
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 /**
@@ -89,8 +95,14 @@ reviewSchema.post(/^findOneAnd/, function () {
  * static function of Review Model to calculate new values of ratingsAverage, ratingsQuantity
  * and saves it to the tour document
  */
-reviewSchema.post('deleteOne', function () {
-  this.constructor.calcRatingsAverage(this.tourId);
+reviewSchema.pre('deleteOne', async function (next) {
+  try {
+    const doc = await this.model.findById(this._conditions._id);
+    this.model.calcRatingsAverage(doc.tourId);
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 const Review = mongoose.model('Review', reviewSchema);
 module.exports = Review;
