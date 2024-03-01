@@ -40,6 +40,17 @@ exports.addReview = createResource(Review, [
 ]);
 exports.getReviewById = getResourceById(Review);
 exports.deleteReview = deleteResourceById(Review);
+
+/**
+ * This function is a middleware used for verifying ownership of a Review document
+ * This verification is required when a review is being updated or deleted.
+ *
+ * The id of currently loggedIn user should match the userId in the review document
+ * being updated or deleted
+ * @param req
+ * @param res
+ * @param next
+ */
 exports.verifyUserForOwnership = async (req, res, next) => {
   try {
     const { user } = req;
