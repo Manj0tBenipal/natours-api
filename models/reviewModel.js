@@ -43,6 +43,11 @@ reviewSchema.pre('save', function (next) {
   next();
 });
 
+/**
+ * This function uses the tourId and calculated the ratingsAverage and ratingsQuantity
+ * of a tour using its reviews.
+ * @param tour id of a document of Tour collection
+ */
 reviewSchema.statics.calcRatingsAverage = async function (tour) {
   const stats = await this.aggregate([
     {
@@ -61,7 +66,21 @@ reviewSchema.statics.calcRatingsAverage = async function (tour) {
     ratingsQuantity: stats[0].totalRatings,
   });
 };
+/**
+ * When a new review is saved this post-save hook calls
+ * static function of Review Model to calculate new values of ratingsAverage, ratingsQuantity
+ * and saves it to the tour document
+ */
 reviewSchema.post('save', function () {
+  this.constructor.calcRatingsAverage(this.tourId);
+});
+
+/**
+ * When an existing review is updated this post-save hook calls
+ * static function of Review Model to calculate new values of ratingsAverage, ratingsQuantity
+ * and saves it to the tour document
+ */
+reviewSchema.post(/^findOneAnd/, function (next) {
   this.constructor.calcRatingsAverage(this.tourId);
 });
 const Review = mongoose.model('Review', reviewSchema);
