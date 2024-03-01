@@ -1,4 +1,5 @@
 const Review = require('../models/reviewModel');
+const User = require('../models/userModel');
 const {
   getResourceById,
   createResource,
@@ -37,3 +38,30 @@ exports.addReview = createResource(Review, [
   'rating',
 ]);
 exports.getReviewById = getResourceById(Review);
+exports.deleteReview = async (req, res) => {
+  try {
+    const { user } = req;
+    const { id } = req.params;
+    const userDoc = await User.findById(user._id).select('+role');
+    const review = await Review.findById(id);
+    if (!review) throw new Error('No review Found!');
+    //check if the user is owner of the review
+    //if not, check if admin is performing the action
+    if (!review.userId.equals(user._id))
+      if (userDoc.role !== 'admin')
+        throw new Error('You are not allowed to perform this action');
+
+    await review.deleteOne();
+    res.status(201).json({
+      status: 'success',
+      data: {
+        deletedReview: review._id,
+      },
+    });
+  } catch (err) {
+    res.status(401).json({
+      status: 'failed',
+      err: err.message,
+    });
+  }
+};
