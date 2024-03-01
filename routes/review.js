@@ -5,7 +5,7 @@ const {
   getReviewById,
   addTourAndUserId,
 
-  addTourIdToQuery,
+  addTourIdToQuery, deleteReview,
 } = require('../controllers/review');
 const { isLoggedIn, allowAccessTo } = require('../controllers/auth');
 
@@ -17,5 +17,8 @@ router
   //and if tourId is not provided in req.body, it assigns it from req.params
   //Thi is done to support adding review using nested routed and normal POST /reviews route
   .post(isLoggedIn, allowAccessTo('user'), addTourAndUserId, addReview);
-router.route('/:id').get(getReviewById);
+router
+  .route('/:id')
+  .get(getReviewById)
+  .delete(isLoggedIn, allowAccessTo('admin', 'user'), deleteReview);
 module.exports = router;
