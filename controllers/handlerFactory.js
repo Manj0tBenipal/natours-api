@@ -24,8 +24,8 @@ exports.getResources = (Model) => async (req, res) => {
 /**
  * This function fetches a document from the given Model using document id
  * provided in req.params
- * @param {Mongoose.model} Model 
-
+ * @param {Mongoose.model} Model
+ * @param {any} options
  */
 exports.getResourceById =
   (Model, options = {}) =>
