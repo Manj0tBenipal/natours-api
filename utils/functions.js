@@ -78,3 +78,14 @@ exports.filterObject = (object, allowedKeys) => {
   });
   return object;
 };
+/**
+ * This function is a wrapper around all the async routeHandlers. It accepts a routeHandler function as an argument
+ * then returns an anonymous function which calls the routeHandler function with a .catch block to pass the
+ * route handling to the global error handling middleware
+ * @param fn routeHandler function
+ * @returns {function(Request, Response, next): Promise<Response>}
+ */
+
+const catchAsync = (fn) => (req, res, next) => fn(req, res, next).catch(next);
+
+exports.catchAsync = catchAsync;
