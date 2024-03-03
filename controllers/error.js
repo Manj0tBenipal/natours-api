@@ -74,6 +74,19 @@ const handleDuplicateKeyFromDB = (err) => {
   }
   return new AppError(`Duplicate values are not allowed for ${key}`, 400);
 };
+/**
+ * This function is used to handle validation errors and for each wrong
+ * input, it concatenates the messages and generates a single error message
+ * @param err
+ * @returns {AppError}
+ */
+const handleValidationErrorFromDb = (err) => {
+  let errors = '';
+  Object.keys(err.errors).forEach((key) => {
+    errors += `${err.errors[key].message}, `;
+  });
+  return new AppError(errors, 400);
+};
 module.exports = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendDevError(err, res);
@@ -92,6 +105,8 @@ module.exports = (err, req, res, next) => {
 
     if (err.name === 'CastError') error = handleCastErrorFromDB(err);
     if (err.code === 11000) error = handleDuplicateKeyFromDB(err);
+    if (err.name === 'ValidationError')
+      error = handleValidationErrorFromDb(err);
     sendUserFriendlyError(error, res);
   }
 };
