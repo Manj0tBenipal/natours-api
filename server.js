@@ -8,3 +8,7 @@ const db = process.env.DB_URL.replace('PASSWORD', process.env.DB_PASS).replace(
 );
 mongoose.connect(db);
 app.listen(process.env.PORT);
+process.on('unhandledRejection', (err) => {
+  console.log(err.name, err.message);
+  process.exit(1);
+});
