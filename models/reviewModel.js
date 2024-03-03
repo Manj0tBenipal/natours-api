@@ -27,6 +27,7 @@ const reviewSchema = new mongoose.Schema({
   createdAt: Date,
 });
 
+reviewSchema.index({ tourId: 1, userId: 1 }, { unique: true });
 //removed unused fields from the query selection
 reviewSchema.pre(/^find/, function (next) {
   this.select('-__v');
@@ -35,7 +36,7 @@ reviewSchema.pre(/^find/, function (next) {
 /**
  * Assigns value to createdAt field in Review,
  * Even if user provides this field in order to manipulate createdAt manually
- * it will be overriden by this pre-save hook
+ * it will be overridden by this pre-save hook
  */
 reviewSchema.pre('save', function (next) {
   if (!this.isNew) return next();
