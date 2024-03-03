@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const tourRouter = require(`${__dirname}/routes/tours.js`);
 const reviewRouter = require(`${__dirname}/routes/review.js`);
 const userRouter = require(`${__dirname}/routes/users.js`);
+const errorHandler = require('./controllers/error');
 
 const limiter = rateLimit({
   max: 100,
@@ -44,13 +45,5 @@ app.all('*', (req, res) => {
     err: 'This tour does not exist',
   });
 });
-app.use((err, req, res, next) => {
-  let { statusCode, message } = err;
-  if (!statusCode) statusCode = 500;
-  if (!message) message = 'An unknown error has occured';
-  res.status(statusCode).json({
-    status: 'fail',
-    message: message,
-  });
-});
+app.use(errorHandler);
 module.exports = app;
