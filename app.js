@@ -37,5 +37,10 @@ app.use(express.json());
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/reviews', reviewRouter);
-
+app.all('*', (req, res) => {
+  res.status(404).json({
+    status: 'failed',
+    err: 'This tour does not exist',
+  });
+});
 module.exports = app;
