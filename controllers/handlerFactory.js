@@ -1,83 +1,58 @@
 const APIFeatures = require('../utils/APIFeatures');
-const { filterObject } = require('../utils/functions');
-
+const { filterObject, catchAsync } = require('../utils/functions');
+const AppError = require('../utils/AppError');
 /**
  * This function returns all the documents in a collection
- * The results are filtetred using methods in APIFeatures class
+ * The results are filtered using methods in APIFeatures class
  * @param {Mongoose.model} Model
  */
-exports.getResources = (Model) => async (req, res) => {
-  try {
+exports.getResources = (Model) =>
+  catchAsync(async (req, res, next) => {
     const fetchUsers = new APIFeatures(Model, req.query);
     const users = await fetchUsers.execute();
     res.status(200).json({
       status: 'success',
       ...users,
     });
-  } catch (err) {
-    res.status(500).json({
-      status: 'failed',
-      err,
-    });
-  }
-};
+  });
 /**
  * This function fetches a document from the given Model using document id
  * provided in req.params
  * @param {Mongoose.model} Model
  * @param {any} options
  */
-exports.getResourceById =
-  (Model, options = {}) =>
-  async (req, res) => {
-    try {
-      const { id } = req.params;
-      const query = Model.findById(id);
-      if (options.populate) query.populate({ ...options.populate });
-      const doc = await query;
-      if (!doc) {
-        throw new Error('404');
-      }
-      res.status(200).json({
-        status: 'success',
-        data: { [Model.modelName.toLowerCase()]: doc },
-      });
-    } catch (err) {
-      const status = err.message === '404' ? 404 : 400;
-
-      res.status(status).json({
-        status: 'fail',
-        err:
-          status === 400
-            ? 'Document id is invalid '
-            : 'Document does not exist',
-      });
+exports.getResourceById = (Model, options = {}) =>
+  catchAsync(async (req, res, next) => {
+    const { id } = req.params;
+    const query = Model.findById(id);
+    if (options.populate) query.populate({ ...options.populate });
+    const doc = await query;
+    if (!doc) {
+      throw new AppError('No documents found', 400);
     }
-  };
+    res.status(200).json({
+      status: 'success',
+      data: { [Model.modelName.toLowerCase()]: doc },
+    });
+  });
 
 /**
  * This function deletes a document from the provided Model using the document id
  * from req.params
  * @param {Mongoose.model} Model
  */
-exports.deleteResourceById = (Model) => async (req, res) => {
-  try {
+exports.deleteResourceById = (Model) =>
+  catchAsync(async (req, res, next) => {
     const { id } = req.params;
-    const user = await Model.findOneAndDelete({ _id: id });
-    if (!user) throw new Error('Invalid DocumentID');
+    const doc = await Model.findOneAndDelete({ _id: id });
+    if (!doc) throw new AppError('Invalid DocumentID', 400);
     res.status(200).json({
       status: 'success',
       data: {
-        deletedDoc: user._id,
+        deletedDoc: doc._id,
       },
     });
-  } catch (err) {
-    res.status(401).json({
-      status: 'failed',
-      err: err.message,
-    });
-  }
-};
+  });
 
 /**
  * This function updates a resource in provided model using  data from req.body
@@ -85,59 +60,36 @@ exports.deleteResourceById = (Model) => async (req, res) => {
  * @param {Mongoose.model} Model
  * @param {String[]} allowedKeys
  */
-exports.updateResource = (Model, allowedKeys) => async (req, res) => {
-  const { id } = req.params;
-  const updatedData = filterObject(req.body, allowedKeys);
-  try {
+exports.updateResource = (Model, allowedKeys) =>
+  catchAsync(async (req, res, next) => {
+    const { id } = req.params;
+    const updatedData = filterObject(req.body, allowedKeys);
+
     const data = await Model.findOneAndUpdate(
       { _id: id },
       { $set: { ...updatedData } },
       { runValidators: true, new: true },
     );
-    if (data.matchedCount === 0) {
-      throw new Error('400');
-    }
+    if (data.matchedCount === 0) throw new AppError('Invalid DocumentId', 400);
+
     res.status(200).json({
       status: 'success',
       data: {
         data,
       },
     });
-  } catch (err) {
-    const status = err.message === '400' ? 400 : 500;
-    res.status(status).json({
-      status: 'fail',
-      err:
-        status === 400
-          ? 'Document not found'
-          : {
-              type: err.name,
-              message: err.message,
-            },
-    });
-  }
-};
+  });
 /**
  * This method creates a new document using the data provided in the req.body
  * The incoming data is filtered based on the provided array of allowedKeys
  * @param {Mongoose.model} Model
  * @param {String[]} allowedKeys only object keys specified in this array are allowed to be added into db
  */
-exports.createResource = (Model, allowedKeys) => async (req, res) => {
-  const { body } = req;
-  try {
+exports.createResource = (Model, allowedKeys) =>
+  catchAsync(async (req, res, next) => {
+    const { body } = req;
     const data = await Model.create({
       ...filterObject(body, allowedKeys),
     });
     res.status(201).json({ status: 'suceess', data: { data } });
-  } catch (err) {
-    res.status(400).json({
-      err: {
-        type: err.name,
-        message: err.message,
-      },
-      status: 'fail',
-      message: 'falied to save document',
-    });
-  }
-};
+  });
