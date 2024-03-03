@@ -114,3 +114,36 @@ exports.getMonthlyPlan = async (req, res) => {
     });
   }
 };
+
+/**
+ *This route handler accepts distance range, user's location and the unit of distance
+ * as a param in request and returns all the available tours that are within the provided
+ * distance from user's location
+ * The url structure looks like: /tours/within/:distance/center/:latlong/unit/:unit
+ */
+exports.getToursWithin = async (req, res) => {
+  try {
+    const { distance, latlong, unit } = req.params;
+    const [lat, long] = latlong.split(',');
+    if (!lat || !long)
+      throw new Error('Please provide location in format: lat,long');
+
+    //calculating the distance is radians by dividing it with the radius of earth,
+    //radians are calculated based on the unit provided in the params
+    const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+    const tours = await Tour.find({
+      startLocation: { $geoWithin: { $centerSphere: [[long, lat], radius] } },
+    });
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tours,
+      },
+    });
+  } catch (err) {
+    res.status(401).json({
+      status: 'falied',
+      err: err.message,
+    });
+  }
+};

@@ -9,6 +9,7 @@ const {
   getMonthlyPlan,
   deleteTour,
   updateTour,
+  getToursWithin,
 } = require(`../controllers/tours`);
 const { modifyQueryToFilterObjSyntax } = require('../utils/functions');
 const { isLoggedIn, allowAccessTo } = require('../controllers/auth');
@@ -19,8 +20,13 @@ router
   .route('/')
   .get(modifyQueryToFilterObjSyntax, getTours)
   .post(isLoggedIn, allowAccessTo('admin', 'lead-guide'), addTour);
+
 router.route('/top-five-tours').get(aliasTopFiveTours, getTours);
+
+router.get('/within/:distance/center/:latlong/unit/:unit', getToursWithin);
+
 router.route('/stats').get(getToursStats);
+
 router
   .route(
     isLoggedIn,
@@ -28,6 +34,7 @@ router
     '/monthly-plan/:year',
   )
   .get(getMonthlyPlan);
+
 router
   .route('/:id')
   .get(getTourById)
