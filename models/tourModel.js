@@ -1,5 +1,6 @@
 const mongoose = require(`mongoose`);
-// const slugify = require('slugify');
+const Review = require('./reviewModel');
+
 const toursSchema = new mongoose.Schema(
   {
     name: {
@@ -174,7 +175,7 @@ toursSchema.pre('findOneAndUpdate', async function (next) {
   let valid = true;
   let errorField = '';
   const errorMessage =
-    'Validation Error. priceDicount cannot be greater than price';
+    'Validation Error. priceDiscount cannot be greater than price';
   // ---- VALIDATION FOR PRICE AND PRICEDISCOUNT ON UPDATE OPERATIONS---
   /**
    * the .get(<property name>) is a setter provided my mongoose to access
@@ -217,18 +218,17 @@ toursSchema.pre('findOneAndUpdate', async function (next) {
   }
   next();
 });
-// //Document middleware: runs before .save and .create()
-// toursSchema.pre('save', function (next) {
-//   //the 'this' keyword inside of a document middleware's body
-//   //refers to the current document being processed
-//   this.slug = `${slugify(this.name, { lower: true })}-${crypto.randomUUID()}`;
-//   next();
-// });
-
-// toursSchema.post('save', function (doc, next) {
-//   console.log(doc);
-//   next();
-// });
-
+/**
+ * This pre-delete middleware deletes all the reviews of a tour that is being deleted
+ */
+toursSchema.pre('findOneAndDelete', async function (next) {
+  try {
+    const tourId = this.getQuery()._id;
+    await Review.deleteMany({ tourId });
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 const Tour = mongoose.model('Tour', toursSchema);
 module.exports = Tour;
