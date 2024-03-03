@@ -14,8 +14,16 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
-app.listen(process.env.PORT);
+const server = app.listen(process.env.PORT);
 process.on('unhandledRejection', (err) => {
   console.log(err.name, err.message);
-  process.exit(1);
+  server.close(() => {
+    process.exit(1);
+  });
+});
+process.on('uncaughtException', (err) => {
+  console.log(err.name, err.message);
+  server.close(() => {
+    process.exit(1);
+  });
 });
