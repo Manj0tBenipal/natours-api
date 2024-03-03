@@ -40,12 +40,40 @@ const sendDevError = (err, res) => {
   });
 };
 
+/**
+ * This function uses mongodb error to construct a new AppError to exclude all the
+ * sensitive information from the message that is to be sent to the user
+ * @param  {Error } err
+ * @returns {AppError}
+ */
 const handleCastErrorFromDB = (err) =>
   new AppError(
     `Data: '${err.value}' is not valid for field: '${err.path}'`,
     400,
   );
 
+/**
+ * his function uses mongodb error to construct a new AppError to exclude all the
+ * sensitive information from the message that is to be sent to the user
+ * @param err
+ * @returns {AppError}
+ */
+const handleDuplicateKeyFromDB = (err) => {
+  /*
+   * The errmsg looks like: 'E11000 duplicate key error collection: natours.users index: email_1 dup key: { email: "user@mail.com" }'
+   * String.prototype.split() is used to extract the fields inside of { }.
+   */
+  let key;
+  try {
+    key = err.errmsg.split('{')[1].split('}')[0].trim();
+  } catch (error) {
+    console.log(error);
+    return new AppError(
+      `Looks like you're providing duplicate values for one of the fields. Please refer to the documentation`,
+    );
+  }
+  return new AppError(`Duplicate values are not allowed for ${key}`, 400);
+};
 module.exports = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendDevError(err, res);
@@ -63,6 +91,7 @@ module.exports = (err, req, res, next) => {
     //It is thrown when a user provides invalid documentId
 
     if (err.name === 'CastError') error = handleCastErrorFromDB(err);
+    if (err.code === 11000) error = handleDuplicateKeyFromDB(err);
     sendUserFriendlyError(error, res);
   }
 };
