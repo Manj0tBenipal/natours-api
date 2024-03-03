@@ -1,5 +1,7 @@
 const Review = require('../models/reviewModel');
 const User = require('../models/userModel');
+const AppError = require('../utils/AppError');
+
 const {
   getResourceById,
   createResource,
@@ -7,6 +9,7 @@ const {
   deleteResourceById,
   updateResource,
 } = require('./handlerFactory');
+const { catchAsync } = require('../utils/functions');
 
 exports.getAllReviews = getResources(Review);
 exports.addTourAndUserId = (req, res, next) => {
@@ -52,23 +55,16 @@ exports.updateReview = updateResource(Review, ['text', 'rating']);
  * @param res
  * @param next
  */
-exports.verifyUserForOwnership = async (req, res, next) => {
-  try {
-    const { user } = req;
-    const { id } = req.params;
-    const userDoc = await User.findById(user._id).select('+role');
-    const review = await Review.findById(id);
-    if (!review) throw new Error('No review Found!');
-    //check if the user is owner of the review
-    //if not, check if admin is performing the action
-    if (!review.userId.equals(user._id))
-      if (userDoc.role !== 'admin')
-        throw new Error('You are not allowed to perform this action');
-    next();
-  } catch (err) {
-    res.status(401).json({
-      status: 'failed',
-      err: err.message,
-    });
-  }
-};
+exports.verifyUserForOwnership = catchAsync(async (req, res, next) => {
+  const { user } = req;
+  const { id } = req.params;
+  const userDoc = await User.findById(user._id).select('+role');
+  const review = await Review.findById(id);
+  if (!review) throw new AppError('No review Found!', 400);
+  //check if the user is owner of the review
+  //if not, check if admin is performing the action
+  if (!review.userId.equals(user._id))
+    if (userDoc.role !== 'admin')
+      throw new Error('You are not allowed to perform this action', 403);
+  next();
+});
