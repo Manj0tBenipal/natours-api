@@ -1,4 +1,6 @@
 const Tour = require('../models/tourModel');
+const AppError = require('../utils/AppError');
+
 const {
   getResourceById,
   deleteResourceById,
@@ -6,6 +8,7 @@ const {
   createResource,
   getResources,
 } = require('./handlerFactory');
+const { catchAsync } = require('../utils/functions');
 
 const allowedKeys = [
   'name',
@@ -33,117 +36,95 @@ exports.aliasTopFiveTours = (req, res, next) => {
   next();
 };
 
-exports.getToursStats = async (req, res) => {
-  try {
-    const stats = await Tour.aggregate([
-      {
-        $match: { ratingsAverage: { $gte: 1 } },
+exports.getToursStats = catchAsync(async (req, res) => {
+  const stats = await Tour.aggregate([
+    {
+      $match: { ratingsAverage: { $gte: 1 } },
+    },
+    {
+      $group: {
+        _id: '$difficulty',
+        totalTours: { $sum: 1 },
+        avgRating: { $avg: '$ratingsAverage' },
+        avgPrice: { $avg: '$price' },
+        minPrice: { $min: '$price' },
       },
-      {
-        $group: {
-          _id: '$difficulty',
-          totalTours: { $sum: 1 },
-          avgRating: { $avg: '$ratingsAverage' },
-          avgPrice: { $avg: '$price' },
-          minPrice: { $min: '$price' },
+    },
+    {
+      $sort: {
+        avgPrice: -1,
+      },
+    },
+  ]);
+  res.status(200).json({
+    status: 'success',
+    data: { stats },
+  });
+});
+exports.getMonthlyPlan = catchAsync(async (req, res) => {
+  const { year } = req.params;
+  const plan = await Tour.aggregate([
+    {
+      $unwind: '$startDates',
+    },
+    {
+      $match: {
+        startDates: {
+          $gte: new Date(`${year}-01-01`),
+          $lte: new Date(`${year}-12-31`),
         },
       },
-      {
-        $sort: {
-          avgPrice: -1,
-        },
+    },
+    {
+      $group: {
+        _id: { $month: '$startDates' },
+        count: { $sum: 1 },
+        tours: { $push: '$name' },
       },
-    ]);
-    res.status(200).json({
-      status: 'success',
-      data: { stats },
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: 'fail',
-      err: err,
-    });
-  }
-};
-exports.getMonthlyPlan = async (req, res) => {
-  try {
-    const { year } = req.params;
-    const plan = await Tour.aggregate([
-      {
-        $unwind: '$startDates',
+    },
+    {
+      $addFields: {
+        month: '$_id',
       },
-      {
-        $match: {
-          startDates: {
-            $gte: new Date(`${year}-01-01`),
-            $lte: new Date(`${year}-12-31`),
-          },
-        },
+    },
+    {
+      $project: {
+        _id: 0,
       },
-      {
-        $group: {
-          _id: { $month: '$startDates' },
-          count: { $sum: 1 },
-          tours: { $push: '$name' },
-        },
+    },
+    {
+      $sort: {
+        month: 1,
       },
-      {
-        $addFields: {
-          month: '$_id',
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-        },
-      },
-      {
-        $sort: {
-          month: 1,
-        },
-      },
-    ]);
-    res.status(200).json({
-      status: 'success',
-      data: { plan },
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: 'fail',
-      err: err,
-    });
-  }
-};
-
+    },
+  ]);
+  res.status(200).json({
+    status: 'success',
+    data: { plan },
+  });
+});
 /**
  *This route handler accepts distance range, user's location and the unit of distance
  * as a param in request and returns all the available tours that are within the provided
  * distance from user's location
  * The url structure looks like: /tours/within/:distance/center/:latlong/unit/:unit
  */
-exports.getToursWithin = async (req, res) => {
-  try {
-    const { distance, latlong, unit } = req.params;
-    const [lat, long] = latlong.split(',');
-    if (!lat || !long)
-      throw new Error('Please provide location in format: lat,long');
+exports.getToursWithin = catchAsync(async (req, res) => {
+  const { distance, latlong, unit } = req.params;
+  const [lat, long] = latlong.split(',');
+  if (!lat || !long)
+    throw new AppError('Please provide location in format: lat,long', 400);
 
-    //calculating the distance is radians by dividing it with the radius of earth,
-    //radians are calculated based on the unit provided in the params
-    const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
-    const tours = await Tour.find({
-      startLocation: { $geoWithin: { $centerSphere: [[long, lat], radius] } },
-    });
-    res.status(200).json({
-      status: 'success',
-      data: {
-        tours,
-      },
-    });
-  } catch (err) {
-    res.status(401).json({
-      status: 'falied',
-      err: err.message,
-    });
-  }
-};
+  //calculating the distance is radians by dividing it with the radius of earth,
+  //radians are calculated based on the unit provided in the params
+  const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+  const tours = await Tour.find({
+    startLocation: { $geoWithin: { $centerSphere: [[long, lat], radius] } },
+  });
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tours,
+    },
+  });
+});
