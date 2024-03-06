@@ -3,6 +3,7 @@ const {
   getMaxPageCount,
   convertToInteger,
 } = require('./functions');
+const AppError = require('./AppError');
 
 class APIFeatures {
   /**
@@ -86,7 +87,7 @@ class APIFeatures {
     // Page number is validated and is required to be an number
     pageNumber = convertToInteger(this.reqQueryObj.page);
     if (pageNumber > this.maxPageCount) {
-      throw new Error('This page does not exist');
+      throw new AppError('This page does not exist', 400);
     }
     this.currentPage = pageNumber;
     // the limit variable is used to skip documents depending upon the page number provided
@@ -94,17 +95,21 @@ class APIFeatures {
   }
 
   async execute() {
-    if (this.reqQueryObj.fields) this.selectFields();
-    if (this.reqQueryObj.sort) this.sort();
-    if (this.reqQueryObj.limit) await this.setItemsPerPage();
-    if (this.reqQueryObj.page) this.applyPagination();
-    const data = await this.dbQuery;
-    return {
-      currentPage: this.currentPage,
-      totalPages: this.maxPageCount,
-      results: data.length,
-      data: data,
-    };
+    try {
+      if (this.reqQueryObj.fields) this.selectFields();
+      if (this.reqQueryObj.sort) this.sort();
+      if (this.reqQueryObj.limit) await this.setItemsPerPage();
+      if (this.reqQueryObj.page) this.applyPagination();
+      const data = await this.dbQuery;
+      return {
+        currentPage: this.currentPage,
+        totalPages: this.maxPageCount,
+        results: data.length,
+        data: data,
+      };
+    } catch (err) {
+      throw new AppError('Something went wrong', 500);
+    }
   }
 }
 module.exports = APIFeatures;
