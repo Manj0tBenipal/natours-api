@@ -7,6 +7,7 @@ const {
   forgotPassword,
   resetPassword,
   changePassword,
+  authUsingCookie,
 } = require('../controllers/auth');
 const {
   getAllUsers,
@@ -22,6 +23,8 @@ const { modifyQueryToFilterObjSyntax } = require('../utils/functions');
 
 const router = express.Router();
 
+//This route is used to verify user's auth status on every request made to the server
+router.get('/auth-using-cookie', isLoggedIn, authUsingCookie);
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/forgot-password', forgotPassword);
