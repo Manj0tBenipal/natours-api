@@ -71,17 +71,21 @@ exports.login = catchAsync(async (req, res) => {
 });
 
 exports.isLoggedIn = catchAsync(async (req, res, next) => {
-  //--CHECKING IF JWT IS PRESENT IN HEADERS
-  const { headers } = req;
-  const authHeader = headers.authorization;
-  //if 'authorization' is not present in headers -> user is not logged in
-  //Access to the protected route is denied
-  if (!authHeader || !authHeader.startsWith('Bearer'))
-    throw new AppError('You are not logged in', 401);
+  let { session } = req.cookies;
+  //if there is no session cookie check for the JWT in auth headers
+  if (!session) {
+    //--CHECKING IF JWT IS PRESENT IN HEADERS
+    const { headers } = req;
+    const authHeader = headers.authorization;
+    //if 'authorization' is not present in headers -> user is not logged in
+    //Access to the protected route is denied
+    if (!authHeader || !authHeader.startsWith('Bearer'))
+      throw new AppError('You are not logged in', 401);
 
-  //remove the prefix of Bearer from the token
-  const token = authHeader.split(' ')[1];
-  if (!token) throw new AppError('You are not logged in', 401);
+    //remove the prefix of Bearer from the token
+    session = authHeader.split(' ')[1];
+    if (!session) throw new AppError('You are not logged in', 401);
+  }
 
   //---VERIFYING JWT---
   /*
@@ -92,7 +96,7 @@ exports.isLoggedIn = catchAsync(async (req, res, next) => {
    * code will fallback to the catch block which will send a 'failed' respose
    */
   const { id, iat } = await new Promise((resolve, reject) => {
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    jwt.verify(session, process.env.JWT_SECRET, (err, decoded) => {
       if (err) reject(err);
       resolve(decoded);
     });
