@@ -62,7 +62,7 @@ exports.signJWT = (id, res) => {
   const token = jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
   });
-  res.cookie('jwt', token, cookieOptions);
+  res.cookie('session', token, cookieOptions);
   return token;
 };
 
