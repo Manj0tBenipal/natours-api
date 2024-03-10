@@ -15,7 +15,7 @@ exports.getAllReviews = getResources(Review);
 exports.addTourAndUserId = (req, res, next) => {
   const tourIdFromParams = req.params.tourId;
   if (!req.body.tourId) req.body.tourId = tourIdFromParams;
-  req.body.userId = req.user._id;
+  req.body.user = req.user._id;
   next();
 };
 
@@ -37,7 +37,7 @@ exports.addTourIdToQuery = (req, res, next) => {
   next();
 };
 exports.addReview = createResource(Review, [
-  'userId',
+  'user',
   'tourId',
   'text',
   'rating',
