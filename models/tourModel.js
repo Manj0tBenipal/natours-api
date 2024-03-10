@@ -1,5 +1,4 @@
 const mongoose = require(`mongoose`);
-const Review = require('./reviewModel');
 
 const toursSchema = new mongoose.Schema(
   {
@@ -222,6 +221,8 @@ toursSchema.pre('findOneAndUpdate', async function (next) {
  * This pre-delete middleware deletes all the reviews of a tour that is being deleted
  */
 toursSchema.pre('findOneAndDelete', async function (next) {
+  //Tour model is imported locally to prevent circular dependency errors
+  const Review = require('./reviewModel');
   try {
     const tourId = this.getQuery()._id;
     await Review.deleteMany({ tourId });
