@@ -27,7 +27,6 @@ const reviewSchema = new mongoose.Schema({
   createdAt: Date,
 });
 
-reviewSchema.index({ tourId: 1, user: 1 }, { unique: true });
 //removed unused fields from the query selection
 reviewSchema.pre(/^find/, function (next) {
   this.select('-__v');
