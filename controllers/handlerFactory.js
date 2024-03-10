@@ -9,17 +9,17 @@ const AppError = require('../utils/AppError');
 exports.getResources = (Model) =>
   catchAsync(async (req, res, next) => {
     const query = new APIFeatures(Model, req.query);
-    const users = await query.execute();
+    const docs = await query.execute();
     res.status(200).json({
       status: 'success',
-      ...users,
+      ...docs,
     });
   });
 /**
  * This function fetches a document from the given Model using document id
  * provided in req.params
  * @param {Mongoose.model} Model
- * @param {any} options
+ * @param {any} options the virtual fields that a user wants to populate
  */
 exports.getResourceById = (Model, options = {}) =>
   catchAsync(async (req, res, next) => {
