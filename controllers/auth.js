@@ -19,7 +19,13 @@ exports.signup = catchAsync(async (req, res) => {
     status: 'success',
     token,
     data: {
-      user: { name: newUser.name, email: newUser.email, id: newUser._id },
+      user: {
+        role: newUser.role,
+        name: newUser.name,
+        email: newUser.email,
+        id: newUser._id,
+        photo: newUser.photo,
+      },
     },
   });
 });
@@ -40,7 +46,9 @@ exports.login = catchAsync(async (req, res) => {
   if (!email || !password)
     throw new AppError('email or password not provided', 400);
 
-  const user = await User.findOne({ email: email }).select('+password +photo');
+  const user = await User.findOne({ email: email }).select(
+    '+password +photo +role',
+  );
   if (!user) {
     throw new AppError(
       'Authentication failed!. Incorrect email or password',
@@ -66,6 +74,7 @@ exports.login = catchAsync(async (req, res) => {
     token,
     data: {
       user: {
+        role: user.role,
         name: user.name,
         email: user.email,
         id: user._id,
