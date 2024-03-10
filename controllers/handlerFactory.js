@@ -8,8 +8,8 @@ const AppError = require('../utils/AppError');
  */
 exports.getResources = (Model) =>
   catchAsync(async (req, res, next) => {
-    const fetchUsers = new APIFeatures(Model, req.query);
-    const users = await fetchUsers.execute();
+    const query = new APIFeatures(Model, req.query);
+    const users = await query.execute();
     res.status(200).json({
       status: 'success',
       ...users,
