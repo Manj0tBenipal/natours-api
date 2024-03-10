@@ -22,6 +22,6 @@ router
 
 router.use(isLoggedIn);
 router.get('/:id', getReviewById);
-router.use('/:id', allowAccessTo('admin', 'user'), verifyUserForOwnership);
+router.use('/:id', allowAccessTo('admin', 'customer'), verifyUserForOwnership);
 router.route('/:id').delete(deleteReview).patch(updateReview);
 module.exports = router;
