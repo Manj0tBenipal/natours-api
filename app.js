@@ -50,7 +50,7 @@ app.get('/', (req, res) => {
 app.all('*', (req, res) => {
   res.status(404).json({
     status: 'failed',
-    err: 'This tour does not exist',
+    err: 'This route does not exist',
   });
 });
 app.use(errorHandler);
