@@ -8,7 +8,7 @@ const reviewSchema = new mongoose.Schema({
     minLength: 20,
   },
   likes: Number,
-  userId: {
+  user: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',
     required: [true, 'Review must belong to a user'],
@@ -27,12 +27,14 @@ const reviewSchema = new mongoose.Schema({
   createdAt: Date,
 });
 
-reviewSchema.index({ tourId: 1, userId: 1 }, { unique: true });
+reviewSchema.index({ tourId: 1, user: 1 }, { unique: true });
 //removed unused fields from the query selection
 reviewSchema.pre(/^find/, function (next) {
   this.select('-__v');
+  this.populate({ path: 'user' });
   next();
 });
+
 /**
  * Assigns value to createdAt field in Review,
  * Even if user provides this field in order to manipulate createdAt manually
