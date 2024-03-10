@@ -64,7 +64,7 @@ reviewSchema.statics.calcRatingsAverage = async function (tour) {
     },
   ]);
   await Tour.findByIdAndUpdate(tour, {
-    ratingsAverage: stats[0].avgRating,
+    ratingsAverage: Math.round(stats[0].avgRating * 10) / 10,
     ratingsQuantity: stats[0].totalRatings,
   });
 };
