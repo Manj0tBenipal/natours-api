@@ -63,7 +63,7 @@ exports.verifyUserForOwnership = catchAsync(async (req, res, next) => {
   if (!review) throw new AppError('No review Found!', 400);
   //check if the user is owner of the review
   //if not, check if admin is performing the action
-  if (!review.userId.equals(user._id))
+  if (!review.user.equals(user._id))
     if (userDoc.role !== 'admin')
       throw new Error('You are not allowed to perform this action', 403);
   next();
