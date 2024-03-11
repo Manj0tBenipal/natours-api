@@ -283,6 +283,6 @@ exports.changePassword = catchAsync(async (req, res) => {
 });
 
 exports.authUsingCookie = catchAsync(async (req, res, next) => {
-  const { user } = req;
+  const user = await User.findById(req.user._id).select('+role +photo');
   res.status(200).json({ isAuthenticated: true, user: user });
 });
