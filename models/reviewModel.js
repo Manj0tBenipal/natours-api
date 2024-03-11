@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Tour = require('./tourModel');
+const AppError = require('../utils/AppError');
 
 const reviewSchema = new mongoose.Schema({
   text: {
@@ -45,6 +46,14 @@ reviewSchema.pre('save', function (next) {
   next();
 });
 
+reviewSchema.pre('save', async function (next) {
+  const { user, tourId } = this;
+  const reviews = await this.constructor.find({
+    $and: [{ tourId: { $eq: tourId } }, { user: { $eq: user } }],
+  });
+  if (!reviews || reviews.length === 0) next();
+  next(new AppError('Review by this user already exists', 400));
+});
 /**
  * This function uses the tourId and calculated the ratingsAverage and ratingsQuantity
  * of a tour using its reviews.
