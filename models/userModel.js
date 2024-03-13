@@ -25,16 +25,16 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    requried: [true, 'Password is mandatory'],
+    required: [true, 'Password is mandatory'],
     minLength: [12, 'password should be minimum 12 characters long'],
-    maxLength: [20, 'password can be maximun 20 character long'],
+    maxLength: [20, 'password can be maximum 20 character long'],
     select: false,
   },
   passwordConfirm: {
     type: String,
-    requried: [true, 'Password is mandatory'],
+    required: [true, 'Password is mandatory'],
     minLength: [12, 'passwordConfirm should be minimum 12 characters long'],
-    maxLength: [20, 'passwordConfirm can be maximun 20 character long'],
+    maxLength: [20, 'passwordConfirm can be maximum 20 character long'],
     validate: {
       validator: function (value) {
         return this.password === value;
@@ -148,7 +148,7 @@ userSchema.pre('findOneAndUpdate', async function (next) {
   }
 });
 /**
- * Instance method used to compare passowrd while logging in
+ * Instance method used to compare password while logging in
  * In case of an error, it will be caught in the /login route handler
  * and an appropriate response will be sent
  * @param {String} candidatePassword password sent by user in the request
@@ -164,7 +164,7 @@ userSchema.methods.passwordMatch = async function (
 
 /**
  * This function accepts a timestamp in milliseconds and compares it with
- * lastPassowordChange field of the document and returns a boolean:
+ * lastPasswordChange field of the document and returns a boolean:
  * 1. true if password was changed after the input timeStamp
  * 2. false if lastPasswordChange is less than input timeStamp
  * @param {Number} timestamp
