@@ -5,6 +5,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 const tourRouter = require(`${__dirname}/routes/tours.js`);
 const reviewRouter = require(`${__dirname}/routes/review.js`);
@@ -20,6 +21,7 @@ const app = express();
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+app.use(cors());
 app.use('/api', limiter);
 app.use(mongoSanitize());
 app.use(xss());
