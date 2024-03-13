@@ -8,7 +8,7 @@ const AppError = require('./AppError');
 class APIFeatures {
   /**
    * @param  dbModel mongoose model on using which all the features will be implemented
-   * @param reqQueryObj  qyeryString object from incoming request
+   * @param reqQueryObj  queryString object from incoming request
    */
   constructor(dbModel, reqQueryObj) {
     this.dbModel = dbModel;
@@ -23,7 +23,7 @@ class APIFeatures {
   /**
    *
    * @param reqObj incoming req.query object
-   * This filtetred object omits parameters that are used by the API
+   * This filtered object omits parameters that are used by the API
    * but are not compatible with the syntax of mongodb filter object
    * @returns an object which has changed by removing extra parameters
    * that are not a part of filterObject required in mongoose query
@@ -44,7 +44,7 @@ class APIFeatures {
   /**
    * This methods uses the sort key-value pair in the incoming req(reqQueryObj)
    * to filter the data based on the parameters provided in reqQueryObj.sort
-   * The data can be sorted based on mutiple parameters
+   * The data can be sorted based on multiple parameters
    * Mongoose's Model.find.sort() method accepts multiple parameters separated by a space
    * The query from URL provides parameters separated by a ","
    * Another helper method is used to replace all the commas with a whitespace
@@ -56,9 +56,9 @@ class APIFeatures {
   }
 
   /**
-   * This method applys .select() to the dbQueryObj and
-   * modifies the query to return only those fiels which are specified in the reqQueryObj.
-   * This takes affect in tehe data returned by the query when it is executed
+   * This method applies .select() to the dbQueryObj and
+   * modifies the query to return only those fields which are specified in the reqQueryObj.
+   * This takes affect in the data returned by the query when it is executed
    */
   selectFields() {
     this.dbQuery = this.dbQuery.select(
