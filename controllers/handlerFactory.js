@@ -6,9 +6,8 @@ const AppError = require('../utils/AppError');
  * The results are filtered using methods in APIFeatures class
  * @param {Mongoose.model} Model
  */
-exports.getResources = (Model, options = {}) =>
+exports.getResources = (Model) =>
   catchAsync(async (req, res, next) => {
-    req.query = { ...req.query, ...options.query };
     const query = new APIFeatures(Model, req.query);
     const docs = await query.execute();
     res.status(200).json({

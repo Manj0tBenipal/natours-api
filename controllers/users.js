@@ -9,7 +9,7 @@ const {
   getResourceById,
 } = require('./handlerFactory');
 
-exports.getAllUsers = getResources(User, { query: { includeInactive: true } });
+exports.getAllUsers = getResources(User);
 exports.updateUser = updateResource(User, ['name', 'email', 'role']);
 exports.deleteUser = deleteResourceById(User);
 exports.addUserIdToParams = (req, res, next) => {

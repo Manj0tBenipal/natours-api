@@ -74,29 +74,29 @@ const userSchema = new mongoose.Schema({
  * involving a find operation
  * it executes before any other find query is executed
  */
-userSchema.pre(/^find/, function (next) {
-  /**
-   * in some cases we want the find queries to include users that are
-   * not active for example in case the user wants to activate their account
-   * and in that case the app needs to find user using their email and change active: true
-   *
-   * In case the app needs to include inactive users in the result
-   * the object inside the find query can be passed includeInactive: true
-   * and in this middleware we can filter results based on the value of
-   * includeInactive and then delete this field from the query as it is
-   * not present in the User schema
-   */
+// userSchema.pre(/^find/, function (next) {
+//   /**
+//    * in some cases we want the find queries to include users that are
+//    * not active for example in case the user wants to activate their account
+//    * and in that case the app needs to find user using their email and change active: true
+//    *
+//    * In case the app needs to include inactive users in the result
+//    * the object inside the find query can be passed includeInactive: true
+//    * and in this middleware we can filter results based on the value of
+//    * includeInactive and then delete this field from the query as it is
+//    * not present in the User schema
+//    */
 
-  const { includeInactive } = this._conditions;
+//   const { includeInactive } = this._conditions;
 
-  //Only executed when includeInactive is false or undefined
-  if (!includeInactive) {
-    this.find({ active: true });
-  }
-  //delete includeInactive if it was one of the conditions
-  if (includeInactive !== undefined) delete this._conditions.includeInactive;
-  next();
-});
+//   //Only executed when includeInactive is false or undefined
+//   if (!includeInactive) {
+//     this.find({ active: true });
+//   }
+//   //delete includeInactive if it was one of the conditions
+//   if (includeInactive !== undefined) delete this._conditions.includeInactive;
+//   next();
+// });
 
 /**
  * NOTE: below are two middlewares performing the same operation which is saving/updating password
