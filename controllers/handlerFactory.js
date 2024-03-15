@@ -26,6 +26,7 @@ exports.getResourceById = (Model, options = {}) =>
     const { id } = req.params;
     const query = Model.findById(id);
     if (options.populate) query.populate({ ...options.populate });
+    if (options.select) query.select(`${options.select.join(' ')}`);
     const doc = await query;
     if (!doc) {
       throw new AppError('No documents found', 400);
