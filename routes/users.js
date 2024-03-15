@@ -18,6 +18,7 @@ const {
   activateAccount,
   addUserIdToParams,
   getMe,
+  getUserById,
 } = require('../controllers/users');
 const { modifyQueryToFilterObjSyntax } = require('../utils/functions');
 
@@ -37,10 +38,9 @@ router
   .get(isLoggedIn, modifyQueryToFilterObjSyntax, getAllUsers)
   .patch(isLoggedIn, updateMe);
 
+router.use(isLoggedIn, allowAccessTo('admin'));
+
 //Routes to update and delete User documents but are only accessible by admin
-router
-  .route('/:id')
-  .patch(isLoggedIn, allowAccessTo('admin'), updateUser)
-  .delete(isLoggedIn, allowAccessTo('admin'), deleteUser);
-router.get('/me', isLoggedIn, addUserIdToParams, getMe);
+router.route('/:id').get(getUserById).patch(updateUser).delete(deleteUser);
+router.get('/me', addUserIdToParams, getMe);
 module.exports = router;
