@@ -29,6 +29,7 @@
         "_id": "5c88fa8cf4afda39709c2959",
         "description": "Lummus Park Beach",
         "type": "Point",
+        "address": "QVJC+PJ Miami Beach, FL, USA",
         "coordinates": [-80.128473, 25.781842],
         "day": 1
       },
@@ -36,6 +37,7 @@
         "_id": "5c88fa8cf4afda39709c2958",
         "description": "Islamorada",
         "type": "Point",
+        "address": "80461 Overseas Hwy, Islamorada, FL 33036, USA",
         "coordinates": [-80.647885, 24.909047],
         "day": 2
       },
@@ -43,6 +45,7 @@
         "_id": "5c88fa8cf4afda39709c2957",
         "description": "Sombrero Beach",
         "type": "Point",
+        "address": "2600 Manor Ln, Marathon, FL 33050, USA",
         "coordinates": [-81.0784, 24.707496],
         "day": 3
       },
@@ -50,6 +53,7 @@
         "_id": "5c88fa8cf4afda39709c2956",
         "description": "West Key",
         "type": "Point",
+        "address": "2601 S Roosevelt Blvd, Key West, FL 33040, USA",
         "coordinates": [-81.768719, 24.552242],
         "day": 5
       }
@@ -89,12 +93,14 @@
         "_id": "5c88fa8cf4afda39709c2954",
         "description": "Banff National Park",
         "type": "Point",
+        "address": "111 Lake Louise Dr, Lake Louise, AB T0L 1E0, Canada",
         "coordinates": [-116.214531, 51.417611],
         "day": 1
       },
       {
         "_id": "5c88fa8cf4afda39709c2953",
         "description": "Jasper National Park",
+        "address": "#1 Compound RD, Jasper, AB T0E 1E0, Canada",
         "type": "Point",
         "coordinates": [-118.076152, 52.875223],
         "day": 3
@@ -103,6 +109,7 @@
         "_id": "5c88fa8cf4afda39709c2952",
         "description": "Glacier National Park of Canada",
         "type": "Point",
+        "address": "7G65+QV Glacier, BC, Canada",
         "coordinates": [-117.490309, 51.261937],
         "day": 5
       }
@@ -142,6 +149,7 @@
         "_id": "5c88fa8cf4afda39709c295c",
         "description": "Aspen Highlands",
         "type": "Point",
+        "address": "155 Boomerang Rd, Aspen, CO 81611, USA",
         "coordinates": [-106.855385, 39.182677],
         "day": 1
       },
@@ -149,6 +157,7 @@
         "_id": "5c88fa8cf4afda39709c295b",
         "description": "Beaver Creek",
         "type": "Point",
+        "address": "76 Avondale Ln, Beaver Creek, CO 81620, USA",
         "coordinates": [-106.516623, 39.60499],
         "day": 2
       }
@@ -188,6 +197,7 @@
         "_id": "5c88fa8cf4afda39709c2965",
         "description": "Zion Canyon National Park",
         "type": "Point",
+        "address": "52X7+72 Springdale, UT, USA",
         "coordinates": [-112.987418, 37.198125],
         "day": 1
       },
@@ -195,6 +205,7 @@
         "_id": "5c88fa8cf4afda39709c2964",
         "description": "Antelope Canyon",
         "type": "Point",
+        "address": "VJ7F+QG LeChee, AZ, USA",
         "coordinates": [-111.376161, 36.86438],
         "day": 4
       },
@@ -202,6 +213,7 @@
         "_id": "5c88fa8cf4afda39709c2963",
         "description": "Grand Canyon National Park",
         "type": "Point",
+        "address": "3V5M+HM Grand Canyon Village, AZ, USA",
         "coordinates": [-112.115763, 36.058973],
         "day": 5
       },
@@ -209,6 +221,7 @@
         "_id": "5c88fa8cf4afda39709c2962",
         "description": "Joshua Tree National Park",
         "type": "Point",
+        "address": "2V6R+MR Twentynine Palms, CA, USA",
         "coordinates": [-116.107963, 34.011646],
         "day": 9
       }
@@ -244,6 +257,7 @@
         "_id": "5c88fa8cf4afda39709c2960",
         "description": "New York",
         "type": "Point",
+        "address": "75 Great Lawn Oval, New York, NY 10024, USA",
         "coordinates": [-73.967696, 40.781821],
         "day": 1
       },
@@ -251,6 +265,7 @@
         "_id": "5c88fa8cf4afda39709c295f",
         "description": "Los Angeles",
         "type": "Point",
+        "address": "6218 Sunset Blvd, Los Angeles, CA 90028, USA",
         "coordinates": [-118.324396, 34.097984],
         "day": 3
       },
@@ -258,6 +273,7 @@
         "_id": "5c88fa8cf4afda39709c295e",
         "description": "San Francisco",
         "type": "Point",
+        "address": "315 Powell St, San Francisco, CA 94102, USA",
         "coordinates": [-122.408865, 37.787825],
         "day": 5
       }
@@ -297,6 +313,7 @@
         "_id": "5c88fa8cf4afda39709c296b",
         "description": "Point Dume Beach",
         "type": "Point",
+        "address": "7180 Westward Beach Road, Malibu, CA 90265",
         "coordinates": [-118.809361, 34.003098],
         "day": 1
       },
@@ -304,6 +321,7 @@
         "_id": "5c88fa8cf4afda39709c296a",
         "description": "Venice Skate Park",
         "type": "Point",
+        "address": "East Market Street, Venice, CA 90291",
         "coordinates": [-118.47549, 33.987367],
         "day": 4
       },
@@ -311,6 +329,7 @@
         "_id": "5c88fa8cf4afda39709c2969",
         "description": "San Diego Skydive",
         "type": "Point",
+        "address": "Ramona, CA 92065",
         "coordinates": [-116.830104, 33.022843],
         "day": 6
       },
@@ -318,6 +337,7 @@
         "_id": "5c88fa8cf4afda39709c2968",
         "description": "Kern River Rafting",
         "type": "Point",
+        "address": "480 Sierra Vista Drive, Wofford Heights, CA 93285",
         "coordinates": [-118.4547, 35.710359],
         "day": 7
       },
@@ -325,6 +345,7 @@
         "_id": "5c88fa8cf4afda39709c2967",
         "description": "Yosemite National Park",
         "type": "Point",
+        "address": "9508 Northside Drive, Yosemite National Park, CA 95389",
         "coordinates": [-119.600492, 37.742371],
         "day": 10
       }
@@ -360,6 +381,7 @@
         "_id": "5c88fa8cf4afda39709c2973",
         "description": "Natural Bridges National Monument",
         "type": "Point",
+        "address": "Natural Bridge, Blanding, UT 84511",
         "coordinates": [-109.99953, 37.629017],
         "day": 1
       },
@@ -367,6 +389,7 @@
         "_id": "5c88fa8cf4afda39709c2972",
         "description": "Horseshoe Bend",
         "type": "Point",
+        "address": "US Highway 89, Page, AZ 86040",
         "coordinates": [-111.50954, 36.883269],
         "day": 3
       },
@@ -374,6 +397,7 @@
         "_id": "5c88fa8cf4afda39709c2971",
         "description": "Death Valley National Park",
         "type": "Point",
+        "address": "Tucki Mine Road, Death Valley, CA 92328",
         "coordinates": [-117.07399, 36.501435],
         "day": 6
       }
@@ -413,6 +437,7 @@
         "_id": "5c88fa8cf4afda39709c2975",
         "description": "Yellowknife",
         "type": "Point",
+        "address": "202 Woolgar Avenue, Yellowknife NT X1A 2Y8",
         "coordinates": [-114.406097, 62.439943],
         "day": 1
       }
@@ -448,6 +473,7 @@
         "_id": "5c88fa8cf4afda39709c296f",
         "description": "Beringer Vineyards",
         "type": "Point",
+        "address": "1915 Main St Saint Helena CA",
         "coordinates": [-122.479887, 38.510312],
         "day": 1
       },
@@ -455,6 +481,7 @@
         "_id": "5c88fa8cf4afda39709c296e",
         "description": "Clos Pegase Winery & Tasting Room",
         "type": "Point",
+        "address": "1624 N Oak St, Calistoga, CA 94515",
         "coordinates": [-122.582948, 38.585707],
         "day": 3
       },
@@ -462,6 +489,7 @@
         "_id": "5c88fa8cf4afda39709c296d",
         "description": "Raymond Vineyard and Cellar",
         "type": "Point",
+        "address": "FHJ8+V4F Zinfandel, California",
         "coordinates": [-122.434697, 38.482181],
         "day": 5
       }
