@@ -22,6 +22,7 @@ const allowedKeys = [
   'startDates',
   'locations',
   'guides',
+  'startLocation',
 ];
 exports.getTours = getResources(Tour);
 exports.getTourById = getResourceById(Tour);
