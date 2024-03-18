@@ -24,9 +24,7 @@ const allowedKeys = [
   'guides',
 ];
 exports.getTours = getResources(Tour);
-exports.getTourById = getResourceById(Tour, {
-  populate: { path: 'reviews' },
-});
+exports.getTourById = getResourceById(Tour);
 exports.addTour = createResource(Tour, allowedKeys);
 exports.updateTour = updateResource(Tour, allowedKeys);
 exports.deleteTour = deleteResourceById(Tour);
