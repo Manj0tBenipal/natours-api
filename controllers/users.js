@@ -13,7 +13,13 @@ exports.getUserById = getResourceById(User, {
   select: ['+photo', '+role', '+active'],
 });
 exports.getAllUsers = getResources(User);
-exports.updateUser = updateResource(User, ['name', 'email', 'role', 'active']);
+exports.updateUser = updateResource(User, [
+  'name',
+  'email',
+  'role',
+  'active',
+  'photo',
+]);
 exports.deleteUser = deleteResourceById(User);
 exports.addUserIdToParams = (req, res, next) => {
   req.params.id = req.user._id;
